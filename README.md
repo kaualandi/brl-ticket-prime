@@ -26,3 +26,19 @@ Iterativo e Incremental.
 ## Justificativa Técnica
 
 O modelo iterativo divide o projeto em duas entregas funcionais (AV1 e AV2). Na primeira iteração, a fundação é validada: banco de dados, endpoints básicos, segurança com Dapper e infraestrutura de testes. Só então, na segunda iteração, o motor de vendas com as regras críticas de negócio é construído sobre essa base já verificada. Isso impede que falhas de segurança ou estrutura se propaguem para a parte mais complexa do sistema. Cada iteração gera evidências concretas de engenharia (User Stories, testes com Assert, ADR, Matriz de Riscos), atendendo diretamente à exigência contratual do cliente.
+
+## Pré-requisitos
+
+Para executar o projeto, é necessário ter instalado:
+
+- .NET 8 ou superior
+- SQL Server Express
+- SQL Server Management Studio (SSMS) ou Azure Data Studio
+
+## Configuração do banco
+
+Execute o script abaixo no SQL Server:
+
+```bash
+db/ticketprime.sql
+

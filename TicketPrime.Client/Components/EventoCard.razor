@@ -1,0 +1,40 @@
+@using TicketPrime.Client.Models
+
+<article class="event-card @(Destacado ? "event-card-featured" : string.Empty) @(Hero ? "event-card-hero" : string.Empty)">
+    <div class="event-card-top">
+        <span class="event-badge">@BadgeText</span>
+        <span class="event-date">@EventoItem.Data.ToString("dd/MM/yyyy")</span>
+    </div>
+
+    <div class="event-card-body">
+        <h3>@EventoItem.Titulo</h3>
+        <p>@EventoItem.Descricao</p>
+    </div>
+
+    <div class="event-card-footer">
+        <div class="footer-item">
+            <span class="footer-label">Local</span>
+            <strong>@EventoItem.Local</strong>
+        </div>
+        <div class="footer-item">
+            <span class="footer-label">Dia</span>
+            <strong>@EventoItem.Data.ToString(Hero ? "dddd, dd 'de' MMMM" : "dddd", ptBr)</strong>
+        </div>
+    </div>
+</article>
+
+@code {
+    private readonly System.Globalization.CultureInfo ptBr = new("pt-BR");
+
+    [Parameter, EditorRequired]
+    public required Evento EventoItem { get; set; }
+
+    [Parameter]
+    public bool Destacado { get; set; }
+
+    [Parameter]
+    public bool Hero { get; set; }
+
+    [Parameter]
+    public string BadgeText { get; set; } = "Agenda aberta";
+}

@@ -1,28 +1,66 @@
 @page "/eventos"
 @using TicketPrime.Client.Models
 
-<h1>Lista de Eventos</h1>
+<PageTitle>Eventos</PageTitle>
 
-@if (eventos == null || eventos.Count == 0)
-{
-    <p>Nenhum evento encontrado.</p>
-}
-else
-{
-    @foreach (var evento in eventos)
-    {
-        <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px; border-radius:8px;">
-            <h3>@evento.Titulo</h3>
-            <p><strong>Data:</strong> @evento.Data.ToString("dd/MM/yyyy")</p>
-            <p><strong>Local:</strong> @evento.Local</p>
-            <p>@evento.Descricao</p>
-        </div>
-    }
-}
+<section class="events-page">
+    <div class="events-shell">
+        <section class="events-hero">
+            <div class="hero-copy">
+                <span class="eyebrow">Curadoria Premium</span>
+                <h1>Eventos com presença, clareza e um visual que passa confiança.</h1>
+                <p>
+                    Uma vitrine moderna para destacar o que importa: contexto, agenda e experiência.
+                    Sem poluição visual, sem cara de trabalho improvisado.
+                </p>
+
+                <div class="hero-metrics">
+                    <div class="metric-card">
+                        <span class="metric-value">@eventos.Count</span>
+                        <span class="metric-label">Eventos ativos</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-value">@LocaisUnicos</span>
+                        <span class="metric-label">Locais confirmados</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-value">@ProximoEvento.Data.ToString("dd MMM")</span>
+                        <span class="metric-label">Próxima data</span>
+                    </div>
+                </div>
+            </div>
+
+            <EventoCard EventoItem="ProximoEvento"
+                        Destacado="true"
+                        Hero="true"
+                        BadgeText="Próximo destaque" />
+        </section>
+
+        @if (eventos.Count == 0)
+        {
+            <section class="empty-state">
+                <h2>Nenhum evento encontrado</h2>
+                <p>Quando novos eventos forem publicados, eles aparecerão aqui com a mesma organização visual.</p>
+            </section>
+        }
+        else
+        {
+            <section class="events-grid" aria-label="Lista de eventos">
+                @foreach (var evento in eventosOrdenados)
+                {
+                    var destaque = evento.Id == ProximoEvento.Id;
+
+                    <EventoCard EventoItem="evento"
+                                Destacado="destaque"
+                                BadgeText="@(destaque ? "Mais próximo" : "Agenda aberta")" />
+                }
+            </section>
+        }
+    </div>
+</section>
 
 @code {
-
-    List<Evento> eventos = new List<Evento>
+    private readonly List<Evento> eventos = new()
     {
         new Evento
         {
@@ -30,7 +68,7 @@ else
             Titulo = "Semana da Tecnologia",
             Data = new DateTime(2026, 3, 30),
             Local = "Auditório",
-            Descricao = "Evento sobre inovação"
+            Descricao = "Uma imersão em inovação, produto e engenharia com talks práticos e networking de alto nível."
         },
         new Evento
         {
@@ -38,7 +76,23 @@ else
             Titulo = "Palestra API",
             Data = new DateTime(2026, 4, 2),
             Local = "Sala 204",
-            Descricao = "Conceitos de API REST"
+            Descricao = "Boas práticas para APIs REST bem modeladas, sustentáveis e prontas para escalar."
         }
     };
+
+    private List<Evento> eventosOrdenados => eventos.OrderBy(e => e.Data).ToList();
+
+    private Evento ProximoEvento => eventosOrdenados.FirstOrDefault() ?? new Evento
+    {
+        Titulo = "Sem eventos",
+        Descricao = "Nenhum evento cadastrado no momento.",
+        Data = DateTime.Today,
+        Local = "A definir"
+    };
+
+    private int LocaisUnicos => eventos
+        .Select(e => e.Local)
+        .Where(local => !string.IsNullOrWhiteSpace(local))
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .Count();
 }

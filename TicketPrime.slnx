@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="TicketPrime.Api/TicketPrime.Api.csproj" />
+  <Project Path="TicketPrime.Client/TicketPrime.Client.csproj" />
+</Solution>

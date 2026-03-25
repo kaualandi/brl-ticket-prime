@@ -1,0 +1,300 @@
+@page "/eventos/novo"
+@using System.ComponentModel.DataAnnotations
+@using System.Globalization
+@using System.Net
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
+
+<PageTitle>Cadastrar Evento</PageTitle>
+
+<section class="create-event-page">
+    <div class="create-event-shell">
+        <div class="create-event-header">
+            <span class="create-event-eyebrow">Operação de eventos</span>
+            <h1>Cadastrar novo evento</h1>
+            <p>Preencha os dados essenciais para publicar um evento sem depender de chamadas manuais na API.</p>
+        </div>
+
+        <MudPaper Class="create-event-card" Elevation="0">
+            @if (!string.IsNullOrWhiteSpace(errorMessage))
+            {
+                <MudAlert Severity="Severity.Error" Dense="true" Variant="Variant.Filled" Class="mb-4">
+                    @errorMessage
+                </MudAlert>
+            }
+
+            <EditForm Model="@form" OnValidSubmit="@HandleSubmitAsync">
+                <DataAnnotationsValidator />
+
+                <div class="form-grid">
+                    <MudTextField T="string"
+                                  Label="Nome"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  FullWidth="true"
+                                  For="@(() => form.Nome)"
+                                  @bind-Value="form.Nome" />
+
+                    <MudTextField T="string"
+                                  Label="Local do evento"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  FullWidth="true"
+                                  For="@(() => form.LocalEvento)"
+                                  @bind-Value="form.LocalEvento" />
+
+                    <MudTextField T="string"
+                                  Label="Descrição"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Lines="4"
+                                  FullWidth="true"
+                                  Class="form-field-span-2"
+                                  For="@(() => form.Descricao)"
+                                  @bind-Value="form.Descricao" />
+
+                    <MudNumericField T="int?"
+                                     Label="Capacidade total"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Min="1"
+                                     FullWidth="true"
+                                     For="@(() => form.CapacidadeTotal)"
+                                     @bind-Value="form.CapacidadeTotal" />
+
+                    <MudDatePicker Label="Data do evento"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense"
+                                   Editable="true"
+                                   DateFormat="dd/MM/yyyy"
+                                   Mask="@dateMask"
+                                   InputMode="@(MudBlazor.InputMode.numeric)"
+                                   For="@(() => form.DataEvento)"
+                                   @bind-Date="form.DataEvento" />
+
+                    <MudTextField T="string"
+                                  Label="Preço padrão"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Placeholder="R$ 0,00"
+                                  InputMode="@(MudBlazor.InputMode.@decimal)"
+                                  Immediate="true"
+                                  FullWidth="true"
+                                  For="@(() => form.PrecoPadraoTexto)"
+                                  @bind-Value="form.PrecoPadraoTexto" />
+                </div>
+
+                <div class="form-actions">
+                    <MudButton ButtonType="ButtonType.Submit"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Disabled="@isSubmitting">
+                        @(isSubmitting ? "Salvando..." : "Cadastrar evento")
+                    </MudButton>
+
+                    <MudButton Variant="Variant.Text"
+                               Color="Color.Default"
+                               Disabled="@isSubmitting"
+                               OnClick="@Cancel">
+                        Cancelar
+                    </MudButton>
+                </div>
+            </EditForm>
+        </MudPaper>
+    </div>
+</section>
+
+@code {
+    private readonly IMask dateMask = new DateMask("dd/MM/yyyy");
+    private readonly CadastrarEventoFormModel form = new();
+    private bool isSubmitting;
+    private string? errorMessage;
+
+    private async Task HandleSubmitAsync()
+    {
+        isSubmitting = true;
+        errorMessage = null;
+
+        try
+        {
+            var request = new CriarEventoRequest
+            {
+                Nome = form.Nome.Trim(),
+                Descricao = form.Descricao.Trim(),
+                LocalEvento = form.LocalEvento.Trim(),
+                CapacidadeTotal = form.CapacidadeTotal!.Value,
+                DataEvento = form.DataEvento!.Value,
+                PrecoPadrao = form.PrecoPadrao!.Value
+            };
+
+            var response = await Http.PostAsJsonAsync("/api/eventos", request);
+
+            if (response.StatusCode == HttpStatusCode.Created)
+            {
+                Snackbar.Add("Evento cadastrado com sucesso.", Severity.Success);
+                form.Reset();
+                return;
+            }
+
+            if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                errorMessage = await ExtractErrorMessageAsync(response);
+                return;
+            }
+
+            errorMessage = "Nao foi possivel cadastrar o evento agora. Tente novamente em instantes.";
+        }
+        catch
+        {
+            errorMessage = "Falha ao comunicar com a API de eventos.";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/eventos");
+    }
+
+    private static async Task<string> ExtractErrorMessageAsync(HttpResponseMessage response)
+    {
+        var rawContent = await response.Content.ReadAsStringAsync();
+
+        if (string.IsNullOrWhiteSpace(rawContent))
+        {
+            return "A API retornou um erro de validacao sem detalhes.";
+        }
+
+        try
+        {
+            var problem = System.Text.Json.JsonSerializer.Deserialize<ValidationProblemDetailsResponse>(rawContent,
+                new System.Text.Json.JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+            if (problem is not null)
+            {
+                if (!string.IsNullOrWhiteSpace(problem.Detail))
+                {
+                    return problem.Detail;
+                }
+
+                if (!string.IsNullOrWhiteSpace(problem.Title))
+                {
+                    return problem.Title;
+                }
+
+                if (problem.Errors is not null)
+                {
+                    var firstError = problem.Errors
+                        .SelectMany(entry => entry.Value ?? Array.Empty<string>())
+                        .FirstOrDefault(message => !string.IsNullOrWhiteSpace(message));
+
+                    if (!string.IsNullOrWhiteSpace(firstError))
+                    {
+                        return firstError;
+                    }
+                }
+            }
+        }
+        catch
+        {
+        }
+
+        return rawContent.Trim('"');
+    }
+
+    private sealed class CadastrarEventoFormModel
+    {
+        [Required(ErrorMessage = "Informe o nome do evento.")]
+        public string Nome { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Informe o local do evento.")]
+        public string LocalEvento { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Informe a descricao do evento.")]
+        public string Descricao { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Informe a capacidade total.")]
+        [Range(1, int.MaxValue, ErrorMessage = "A capacidade total deve ser maior que zero.")]
+        public int? CapacidadeTotal { get; set; }
+
+        [Required(ErrorMessage = "Informe a data do evento.")]
+        public DateTime? DataEvento { get; set; }
+
+        [Required(ErrorMessage = "Informe o preco padrao.")]
+        [Range(typeof(decimal), "0.01", "999999999", ErrorMessage = "O preco padrao deve ser maior que zero.")]
+        public decimal? PrecoPadrao { get; set; }
+
+        [Required(ErrorMessage = "Informe o preco padrao.")]
+        public string PrecoPadraoTexto
+        {
+            get => _precoPadraoTexto;
+            set
+            {
+                _precoPadraoTexto = FormatCurrencyInput(value);
+                PrecoPadrao = TryParseCurrency(_precoPadraoTexto);
+            }
+        }
+
+        private string _precoPadraoTexto = string.Empty;
+
+        public void Reset()
+        {
+            Nome = string.Empty;
+            LocalEvento = string.Empty;
+            Descricao = string.Empty;
+            CapacidadeTotal = null;
+            DataEvento = null;
+            PrecoPadrao = null;
+            PrecoPadraoTexto = string.Empty;
+        }
+
+        private static string FormatCurrencyInput(string? input)
+        {
+            var digits = new string((input ?? string.Empty).Where(char.IsDigit).ToArray());
+
+            if (string.IsNullOrEmpty(digits))
+            {
+                return string.Empty;
+            }
+
+            var cents = decimal.Parse(digits) / 100m;
+            return cents.ToString("C", CultureInfo.GetCultureInfo("pt-BR"));
+        }
+
+        private static decimal? TryParseCurrency(string input)
+        {
+            return decimal.TryParse(
+                input,
+                NumberStyles.Currency,
+                CultureInfo.GetCultureInfo("pt-BR"),
+                out var parsedValue)
+                ? parsedValue
+                : null;
+        }
+    }
+
+    private sealed class CriarEventoRequest
+    {
+        public string Nome { get; set; } = string.Empty;
+        public string Descricao { get; set; } = string.Empty;
+        public string LocalEvento { get; set; } = string.Empty;
+        public int CapacidadeTotal { get; set; }
+        public DateTime DataEvento { get; set; }
+        public decimal PrecoPadrao { get; set; }
+    }
+
+    private sealed class ValidationProblemDetailsResponse
+    {
+        public string? Title { get; set; }
+        public string? Detail { get; set; }
+        public Dictionary<string, string[]>? Errors { get; set; }
+    }
+}

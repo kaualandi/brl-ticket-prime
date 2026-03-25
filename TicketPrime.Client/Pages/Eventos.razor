@@ -24,7 +24,7 @@
                         <span class="metric-label">Locais confirmados</span>
                     </div>
                     <div class="metric-card">
-                        <span class="metric-value">@ProximoEvento.Data.ToString("dd MMM")</span>
+                        <span class="metric-value">@ProximoEvento.DataEvento.ToString("dd MMM")</span>
                         <span class="metric-label">Próxima data</span>
                     </div>
                 </div>
@@ -65,33 +65,39 @@
         new Evento
         {
             Id = 1,
-            Titulo = "Semana da Tecnologia",
-            Data = new DateTime(2026, 3, 30),
-            Local = "Auditório",
-            Descricao = "Uma imersão em inovação, produto e engenharia com talks práticos e networking de alto nível."
+            Nome = "Semana da Tecnologia",
+            Descricao = "Uma imersão em inovação, produto e engenharia com talks práticos e networking de alto nível.",
+            CapacidadeTotal = 450,
+            DataEvento = new DateTime(2026, 3, 30),
+            PrecoPadrao = 149.90m,
+            LocalEvento = "Auditório Central"
         },
         new Evento
         {
             Id = 2,
-            Titulo = "Palestra API",
-            Data = new DateTime(2026, 4, 2),
-            Local = "Sala 204",
-            Descricao = "Boas práticas para APIs REST bem modeladas, sustentáveis e prontas para escalar."
+            Nome = "Palestra API",
+            Descricao = "Boas práticas para APIs REST bem modeladas, sustentáveis e prontas para escalar.",
+            CapacidadeTotal = 120,
+            DataEvento = new DateTime(2026, 4, 2),
+            PrecoPadrao = 89.90m,
+            LocalEvento = "Sala 204"
         }
     };
 
-    private List<Evento> eventosOrdenados => eventos.OrderBy(e => e.Data).ToList();
+    private List<Evento> eventosOrdenados => eventos.OrderBy(e => e.DataEvento).ToList();
 
     private Evento ProximoEvento => eventosOrdenados.FirstOrDefault() ?? new Evento
     {
-        Titulo = "Sem eventos",
+        Nome = "Sem eventos",
         Descricao = "Nenhum evento cadastrado no momento.",
-        Data = DateTime.Today,
-        Local = "A definir"
+        CapacidadeTotal = 0,
+        DataEvento = DateTime.Today,
+        PrecoPadrao = 0m,
+        LocalEvento = "A definir"
     };
 
     private int LocaisUnicos => eventos
-        .Select(e => e.Local)
+        .Select(e => e.LocalEvento)
         .Where(local => !string.IsNullOrWhiteSpace(local))
         .Distinct(StringComparer.OrdinalIgnoreCase)
         .Count();

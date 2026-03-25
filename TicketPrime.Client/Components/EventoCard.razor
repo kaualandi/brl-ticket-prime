@@ -3,22 +3,33 @@
 <article class="event-card @(Destacado ? "event-card-featured" : string.Empty) @(Hero ? "event-card-hero" : string.Empty)">
     <div class="event-card-top">
         <span class="event-badge">@BadgeText</span>
-        <span class="event-date">@EventoItem.Data.ToString("dd/MM/yyyy")</span>
+        <span class="event-date">@EventoItem.DataEvento.ToString("dd/MM/yyyy")</span>
     </div>
 
     <div class="event-card-body">
-        <h3>@EventoItem.Titulo</h3>
+        <h3>@EventoItem.Nome</h3>
         <p>@EventoItem.Descricao</p>
+    </div>
+
+    <div class="event-card-meta">
+        <div class="meta-item">
+            <span class="footer-label">Capacidade</span>
+            <strong>@EventoItem.CapacidadeTotal pessoas</strong>
+        </div>
+        <div class="meta-item">
+            <span class="footer-label">Preço padrão</span>
+            <strong>@EventoItem.PrecoPadrao.ToString("C", ptBr)</strong>
+        </div>
     </div>
 
     <div class="event-card-footer">
         <div class="footer-item">
             <span class="footer-label">Local</span>
-            <strong>@EventoItem.Local</strong>
+            <strong>@EventoItem.LocalEvento</strong>
         </div>
         <div class="footer-item">
             <span class="footer-label">Dia</span>
-            <strong>@EventoItem.Data.ToString(Hero ? "dddd, dd 'de' MMMM" : "dddd", ptBr)</strong>
+            <strong>@EventoItem.DataEvento.ToString(Hero ? "dddd, dd 'de' MMMM" : "dddd", ptBr)</strong>
         </div>
     </div>
 </article>

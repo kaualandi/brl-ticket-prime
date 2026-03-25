@@ -1,44 +1,46 @@
--- TicketPrime Database Schema
+-- Esquema do banco de dados TicketPrime
 
-CREATE DATABASE ticket_prime;
+CREATE DATABASE ingresso_prime;
 GO
 
-USE ticket_prime;
+USE ingresso_prime;
 GO
 
-CREATE TABLE users (
+CREATE TABLE usuarios (
     id INT PRIMARY KEY IDENTITY(1,1),
     cpf VARCHAR(11) NOT NULL UNIQUE,
-    name VARCHAR(100) NOT NULL,
+    nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE
 );
 GO
 
-CREATE TABLE events (
+CREATE TABLE eventos (
     id INT PRIMARY KEY IDENTITY(1,1),
-    name VARCHAR(100) NOT NULL,
-    total_capacity INT NOT NULL,
-    event_date DATETIME NOT NULL,
-    default_price DECIMAL(10,2) NOT NULL
+    nome VARCHAR(100) NOT NULL,
+    descricao TEXT NOT NULL,
+    capacidade_total INT NOT NULL,
+    data_evento DATETIME NOT NULL,
+    preco_padrao DECIMAL(10,2) NOT NULL,
+    local_evento VARCHAR(200) NOT NULL
 );
 GO
 
-CREATE TABLE coupons (
+CREATE TABLE cupons (
     id INT PRIMARY KEY IDENTITY(1,1),
-    code VARCHAR(20) NOT NULL UNIQUE,
-    discount_percentage DECIMAL(5,2) NOT NULL,
-    minimum_amount_rule DECIMAL(10,2) NOT NULL
+    codigo VARCHAR(20) NOT NULL UNIQUE,
+    percentual_desconto DECIMAL(5,2) NOT NULL,
+    valor_minimo_regra DECIMAL(10,2) NOT NULL
 );
 GO
 
-CREATE TABLE reservations (
+CREATE TABLE reservas (
     id INT PRIMARY KEY IDENTITY(1,1),
-    user_id VARCHAR(11) NOT NULL,
-    event_id INT NOT NULL,
-    coupon_id VARCHAR(20) NULL,
-    final_amount_paid DECIMAL(10,2) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (event_id) REFERENCES events(id),
-    FOREIGN KEY (coupon_id) REFERENCES coupons(id)
+    usuario_id VARCHAR(11) NOT NULL,
+    evento_id INT NOT NULL,
+    cupom_id VARCHAR(20) NULL,
+    valor_final_pago DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+    FOREIGN KEY (evento_id) REFERENCES eventos(id),
+    FOREIGN KEY (cupom_id) REFERENCES cupons(id)
 );
 GO

@@ -1,30 +1,44 @@
 -- TicketPrime Database Schema
 
-IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'TicketPrime')
-BEGIN
-    CREATE DATABASE TicketPrime;
-END
+CREATE DATABASE ticket_prime;
 GO
 
-USE TicketPrime;
+USE ticket_prime;
 GO
 
--- Eventos
-IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Eventos')
-BEGIN
-    CREATE TABLE Eventos (
-        Id             INT           NOT NULL IDENTITY(1,1) PRIMARY KEY,
-        Nome           VARCHAR(100)  NOT NULL,
-        CapacidadeTotal INT          NOT NULL,
-        DataEvento     DATETIME      NOT NULL,
-        PrecoPadrao    DECIMAL(10,2) NOT NULL
-    );
-END
+CREATE TABLE users (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    cpf VARCHAR(11) NOT NULL UNIQUE,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE
+);
 GO
 
--- Seed data for development
-INSERT INTO Eventos (Nome, CapacidadeTotal, DataEvento, PrecoPadrao) VALUES
-    ('Show Rock in Rio',       50000, '2026-09-20 19:00:00', 350.00),
-    ('Peça de Teatro Hamlet',    800, '2026-10-05 20:30:00',  90.00),
-    ('Corrida de Fórmula E',   15000, '2026-11-12 14:00:00', 220.00);
+CREATE TABLE events (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    name VARCHAR(100) NOT NULL,
+    total_capacity INT NOT NULL,
+    event_date DATETIME NOT NULL,
+    default_price DECIMAL(10,2) NOT NULL
+);
+GO
+
+CREATE TABLE coupons (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    code VARCHAR(20) NOT NULL UNIQUE,
+    discount_percentage DECIMAL(5,2) NOT NULL,
+    minimum_amount_rule DECIMAL(10,2) NOT NULL
+);
+GO
+
+CREATE TABLE reservations (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    user_id VARCHAR(11) NOT NULL,
+    event_id INT NOT NULL,
+    coupon_id VARCHAR(20) NULL,
+    final_amount_paid DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (event_id) REFERENCES events(id),
+    FOREIGN KEY (coupon_id) REFERENCES coupons(id)
+);
 GO

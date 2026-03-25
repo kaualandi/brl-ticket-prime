@@ -1,0 +1,30 @@
+# Build output
+bin/
+obj/
+
+# Test output
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# User-specific files
+*.user
+*.rsuser
+*.suo
+
+# IDE folders
+.vs/
+.vscode/
+.idea/
+
+# Logs and local env files
+*.log
+.env
+.env.*
+
+# OS files
+.DS_Store
+
+# Package folders
+node_modules/

@@ -1,0 +1,51 @@
+@page "/eventos"
+
+<h1>Lista de Eventos</h1>
+
+@if (eventos == null || eventos.Count == 0)
+{
+    <p>Nenhum evento encontrado.</p>
+}
+else
+{
+    @foreach (var evento in eventos)
+    {
+        <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px; border-radius:8px;">
+            <h3>@evento.Titulo</h3>
+            <p><strong>Data:</strong> @evento.Data.ToString("dd/MM/yyyy")</p>
+            <p><strong>Local:</strong> @evento.Local</p>
+            <p>@evento.Descricao</p>
+        </div>
+    }
+}
+
+@code {
+    public class Evento
+    {
+        public int Id { get; set; }
+        public string Titulo { get; set; }
+        public DateTime Data { get; set; }
+        public string Local { get; set; }
+        public string Descricao { get; set; }
+    }
+
+    List<Evento> eventos = new List<Evento>
+    {
+        new Evento
+        {
+            Id = 1,
+            Titulo = "Semana da Tecnologia",
+            Data = new DateTime(2026, 3, 30),
+            Local = "Auditório",
+            Descricao = "Evento sobre inovação"
+        },
+        new Evento
+        {
+            Id = 2,
+            Titulo = "Palestra API",
+            Data = new DateTime(2026, 4, 2),
+            Local = "Sala 204",
+            Descricao = "Conceitos de API REST"
+        }
+    };
+}

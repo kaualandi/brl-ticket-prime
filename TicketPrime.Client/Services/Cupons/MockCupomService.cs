@@ -1,0 +1,91 @@
+namespace TicketPrime.Client.Services.Cupons;
+
+public sealed class MockCupomService : ICupomService
+{
+    private static readonly List<CupomListItem> Cupons =
+    [
+        new CupomListItem { Codigo = "BEMVINDO10", PorcentagemDesconto = 10m, ValorMinimoRegra = 50m },
+        new CupomListItem { Codigo = "FESTA20", PorcentagemDesconto = 20m, ValorMinimoRegra = 120m }
+    ];
+
+    public Task<CriarCupomResult> CriarAsync(CriarCupomRequest request, CancellationToken cancellationToken = default)
+    {
+        var codigo = request.Codigo.Trim();
+
+        if (Cupons.Any(c => string.Equals(c.Codigo, codigo, StringComparison.OrdinalIgnoreCase)))
+        {
+            return Task.FromResult(CriarCupomResult.Fail("Codigo de cupom ja cadastrado."));
+        }
+
+        Cupons.Add(new CupomListItem
+        {
+            Codigo = codigo,
+            PorcentagemDesconto = request.PorcentagemDesconto,
+            ValorMinimoRegra = request.ValorMinimoRegra
+        });
+
+        return Task.FromResult(CriarCupomResult.Ok());
+    }
+
+    public Task<IReadOnlyList<CupomListItem>> ListarAsync(CancellationToken cancellationToken = default)
+    {
+        var ordered = Cupons
+            .OrderBy(c => c.Codigo, StringComparer.OrdinalIgnoreCase)
+            .Select(c => new CupomListItem
+            {
+                Codigo = c.Codigo,
+                PorcentagemDesconto = c.PorcentagemDesconto,
+                ValorMinimoRegra = c.ValorMinimoRegra
+            })
+            .ToList();
+
+        return Task.FromResult<IReadOnlyList<CupomListItem>>(ordered);
+    }
+
+    public Task<CupomListItem?> ObterPorCodigoAsync(string codigo, CancellationToken cancellationToken = default)
+    {
+        var found = Cupons.FirstOrDefault(c =>
+            string.Equals(c.Codigo, codigo.Trim(), StringComparison.OrdinalIgnoreCase));
+
+        if (found is null)
+        {
+            return Task.FromResult<CupomListItem?>(null);
+        }
+
+        return Task.FromResult<CupomListItem?>(new CupomListItem
+        {
+            Codigo = found.Codigo,
+            PorcentagemDesconto = found.PorcentagemDesconto,
+            ValorMinimoRegra = found.ValorMinimoRegra
+        });
+    }
+
+    public Task<CriarCupomResult> AtualizarAsync(string codigoAtual, AtualizarCupomRequest request, CancellationToken cancellationToken = default)
+    {
+        var codigoOriginal = codigoAtual.Trim();
+        var codigoNovo = request.Codigo.Trim();
+
+        var cupomExistente = Cupons.FirstOrDefault(c =>
+            string.Equals(c.Codigo, codigoOriginal, StringComparison.OrdinalIgnoreCase));
+
+        if (cupomExistente is null)
+        {
+            return Task.FromResult(CriarCupomResult.Fail("Cupom nao encontrado para edicao."));
+        }
+
+        var codigoDuplicado = Cupons.Any(c =>
+            !string.Equals(c.Codigo, codigoOriginal, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(c.Codigo, codigoNovo, StringComparison.OrdinalIgnoreCase));
+
+        if (codigoDuplicado)
+        {
+            return Task.FromResult(CriarCupomResult.Fail("Codigo de cupom ja cadastrado."));
+        }
+
+        cupomExistente.Codigo = codigoNovo;
+        cupomExistente.PorcentagemDesconto = request.PorcentagemDesconto;
+        cupomExistente.ValorMinimoRegra = request.ValorMinimoRegra;
+
+        return Task.FromResult(CriarCupomResult.Ok());
+    }
+}

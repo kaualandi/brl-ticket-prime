@@ -1,0 +1,129 @@
+@page "/cupons"
+@using TicketPrime.Client.Services.Cupons
+@inject ICupomService CupomService
+@inject NavigationManager Navigation
+
+<PageTitle>Cupons</PageTitle>
+
+<section class="coupons-page">
+    <div class="coupons-shell">
+        <div class="coupons-header">
+            <div>
+                <span class="coupons-eyebrow">Operacao de cupons</span>
+                <h1>Cupons cadastrados</h1>
+                <p>Consulte os cupons ativos, filtre por codigo e acesse a edicao quando precisar ajustar regras.</p>
+            </div>
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Add"
+                       OnClick="@GoToCreate">
+                Novo cupom
+            </MudButton>
+        </div>
+
+        <MudPaper Class="coupons-card" Elevation="0">
+            @if (!string.IsNullOrWhiteSpace(errorMessage))
+            {
+                <MudAlert Severity="Severity.Error" Dense="true" Variant="Variant.Filled" Class="mb-4">
+                    @errorMessage
+                </MudAlert>
+            }
+
+            <MudTextField T="string"
+                          Label="Buscar por codigo"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          FullWidth="true"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          @bind-Value="searchTerm" />
+
+            @if (isLoading)
+            {
+                <div class="table-loading">
+                    <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                </div>
+            }
+            else
+            {
+                <MudTable T="CupomListItem"
+                          Items="FilteredCupons"
+                          Hover="true"
+                          Dense="true"
+                          Breakpoint="Breakpoint.Sm"
+                          Class="coupons-table">
+                    <HeaderContent>
+                        <MudTh>Codigo</MudTh>
+                        <MudTh>Desconto</MudTh>
+                        <MudTh>Valor minimo</MudTh>
+                        <MudTh>Acoes</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Codigo">@context.Codigo</MudTd>
+                        <MudTd DataLabel="Desconto">@context.PorcentagemDesconto%</MudTd>
+                        <MudTd DataLabel="Valor minimo">@context.ValorMinimoRegra.ToString("C")</MudTd>
+                        <MudTd DataLabel="Acoes">
+                            <MudButton Variant="Variant.Text"
+                                       Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Filled.Edit"
+                                       OnClick="@(() => GoToEdit(context.Codigo))">
+                                Editar
+                            </MudButton>
+                        </MudTd>
+                    </RowTemplate>
+                    <NoRecordsContent>
+                        <MudText Typo="Typo.body1">Nenhum cupom encontrado para esse filtro.</MudText>
+                    </NoRecordsContent>
+                </MudTable>
+            }
+        </MudPaper>
+    </div>
+</section>
+
+@code {
+    private readonly List<CupomListItem> cupons = [];
+    private bool isLoading = true;
+    private string? errorMessage;
+    private string searchTerm = string.Empty;
+
+    private IEnumerable<CupomListItem> FilteredCupons =>
+        cupons.Where(c => string.IsNullOrWhiteSpace(searchTerm)
+            || c.Codigo.Contains(searchTerm.Trim(), StringComparison.OrdinalIgnoreCase));
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCuponsAsync();
+    }
+
+    private async Task LoadCuponsAsync()
+    {
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            var response = await CupomService.ListarAsync();
+            cupons.Clear();
+            cupons.AddRange(response);
+        }
+        catch
+        {
+            errorMessage = "Nao foi possivel carregar os cupons agora.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void GoToCreate()
+    {
+        Navigation.NavigateTo("/cupons/novo");
+    }
+
+    private void GoToEdit(string codigo)
+    {
+        Navigation.NavigateTo($"/cupons/editar/{Uri.EscapeDataString(codigo)}");
+    }
+}

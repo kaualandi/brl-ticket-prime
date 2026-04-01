@@ -1,0 +1,166 @@
+@page "/cupons/novo"
+@using System.ComponentModel.DataAnnotations
+@using System.Globalization
+@using TicketPrime.Client.Services.Cupons
+@inject ICupomService CupomService
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
+
+<PageTitle>Cadastrar Cupom</PageTitle>
+
+<section class="create-coupon-page">
+    <div class="create-coupon-shell">
+        <div class="create-coupon-header">
+            <span class="create-coupon-eyebrow">Operacao de cupons</span>
+            <h1>Cadastrar novo cupom</h1>
+            <p>Crie descontos de forma rapida sem depender de chamadas manuais via Postman.</p>
+        </div>
+
+        <MudPaper Class="create-coupon-card" Elevation="0">
+            @if (!string.IsNullOrWhiteSpace(errorMessage))
+            {
+                <MudAlert Severity="Severity.Error" Dense="true" Variant="Variant.Filled" Class="mb-4">
+                    @errorMessage
+                </MudAlert>
+            }
+
+            <EditForm Model="@form" OnValidSubmit="@HandleSubmitAsync">
+                <DataAnnotationsValidator />
+
+                <div class="form-grid">
+                    <MudTextField T="string"
+                                  Label="Codigo"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  FullWidth="true"
+                                  For="@(() => form.Codigo)"
+                                  @bind-Value="form.Codigo" />
+
+                    <MudNumericField T="decimal?"
+                                     Label="Porcentagem de desconto"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Min="1"
+                                     Max="100"
+                                     Class="percent-field"
+                                     Immediate="true"
+                                     Adornment="Adornment.End"
+                                     AdornmentText="%"
+                                     FullWidth="true"
+                                     For="@(() => form.PorcentagemDesconto)"
+                                     Value="form.PorcentagemDesconto"
+                                     ValueChanged="OnPorcentagemChanged" />
+
+                    <MudNumericField T="decimal?"
+                                     Label="Valor minimo da regra"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Min="0"
+                                     Culture="ptBr"
+                                     Format="N2"
+                                     Adornment="Adornment.Start"
+                                     AdornmentText="R$"
+                                     FullWidth="true"
+                                     For="@(() => form.ValorMinimoRegra)"
+                                     @bind-Value="form.ValorMinimoRegra" />
+                </div>
+
+                <div class="form-actions">
+                    <MudButton ButtonType="ButtonType.Submit"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Disabled="@isSubmitting">
+                        @(isSubmitting ? "Salvando..." : "Cadastrar cupom")
+                    </MudButton>
+
+                    <MudButton Variant="Variant.Text"
+                               Color="Color.Default"
+                               Disabled="@isSubmitting"
+                               OnClick="@Cancel">
+                        Cancelar
+                    </MudButton>
+                </div>
+            </EditForm>
+        </MudPaper>
+    </div>
+</section>
+
+@code {
+    private static readonly CultureInfo ptBr = CultureInfo.GetCultureInfo("pt-BR");
+    private readonly CadastrarCupomFormModel form = new();
+    private bool isSubmitting;
+    private string? errorMessage;
+
+    private void OnPorcentagemChanged(decimal? value)
+    {
+        if (value is null)
+        {
+            form.PorcentagemDesconto = null;
+            return;
+        }
+
+        form.PorcentagemDesconto = decimal.Clamp(value.Value, 1m, 100m);
+    }
+
+    private async Task HandleSubmitAsync()
+    {
+        isSubmitting = true;
+        errorMessage = null;
+
+        try
+        {
+            var request = new CriarCupomRequest
+            {
+                Codigo = form.Codigo.Trim(),
+                PorcentagemDesconto = form.PorcentagemDesconto!.Value,
+                ValorMinimoRegra = form.ValorMinimoRegra!.Value
+            };
+
+            var result = await CupomService.CriarAsync(request);
+
+            if (result.Success)
+            {
+                Snackbar.Add("Cupom cadastrado com sucesso.", Severity.Success);
+                form.Reset();
+                return;
+            }
+
+            errorMessage = result.ErrorMessage;
+        }
+        catch
+        {
+            errorMessage = "Falha ao comunicar com a API de cupons.";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/cupons");
+    }
+
+    private sealed class CadastrarCupomFormModel
+    {
+        [Required(ErrorMessage = "Informe o codigo do cupom.")]
+        public string Codigo { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Informe a porcentagem de desconto.")]
+        [Range(typeof(decimal), "1", "100", ErrorMessage = "A porcentagem de desconto deve estar entre 1 e 100.")]
+        public decimal? PorcentagemDesconto { get; set; }
+
+        [Required(ErrorMessage = "Informe o valor minimo da regra.")]
+        [Range(typeof(decimal), "0", "999999999", ErrorMessage = "O valor minimo da regra nao pode ser negativo.")]
+        public decimal? ValorMinimoRegra { get; set; }
+
+        public void Reset()
+        {
+            Codigo = string.Empty;
+            PorcentagemDesconto = null;
+            ValorMinimoRegra = null;
+        }
+    }
+
+}

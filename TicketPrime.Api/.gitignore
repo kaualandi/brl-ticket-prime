@@ -12,3 +12,5 @@ TestResults/
 *.user
 *.rsuser
 *.suo
+
+appsettings.json

@@ -1,9 +1,9 @@
 -- Esquema do banco de dados TicketPrime
 
-CREATE DATABASE ingresso_prime;
+CREATE DATABASE ticket_prime;
 GO
 
-USE ingresso_prime;
+USE ticket_prime;
 GO
 
 CREATE TABLE usuarios (
@@ -35,9 +35,9 @@ GO
 
 CREATE TABLE reservas (
     id INT PRIMARY KEY IDENTITY(1,1),
-    usuario_id VARCHAR(11) NOT NULL,
+    usuario_id INT NOT NULL,
     evento_id INT NOT NULL,
-    cupom_id VARCHAR(20) NULL,
+    cupom_id INT NULL,
     valor_final_pago DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
     FOREIGN KEY (evento_id) REFERENCES eventos(id),

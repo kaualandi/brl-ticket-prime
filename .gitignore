@@ -1,9 +1,3 @@
-# Workspace / OS
-.DS_Store
-.env
-.env.*
-*.log
-
 # IDE
 .vs/
 .vscode/

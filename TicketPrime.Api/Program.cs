@@ -5,6 +5,8 @@ using TicketPrime.Api.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
+DefaultTypeMap.MatchNamesWithUnderscores = true;
+
 builder.Services.AddControllers();
 builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddRepositories();
@@ -19,7 +21,14 @@ app.UseAuthorization();
 app.MapGet("/api/cupons", async (IDbConnection db) =>
 {
 	var cupons = await db.QueryAsync<Cupom>(
-		"SELECT Codigo, PorcentagemDesconto, ValorMinimoRegra FROM Cupons ORDER BY Codigo");
+		"""
+		SELECT
+			codigo AS Codigo,
+			percentual_desconto AS PorcentagemDesconto,
+			valor_minimo_regra AS ValorMinimoRegra
+		FROM cupons
+		ORDER BY codigo
+		""");
 
 	return Results.Ok(cupons);
 });
@@ -27,7 +36,14 @@ app.MapGet("/api/cupons", async (IDbConnection db) =>
 app.MapGet("/api/cupons/{codigo}", async (string codigo, IDbConnection db) =>
 {
 	var cupom = await db.QueryFirstOrDefaultAsync<Cupom>(
-		"SELECT Codigo, PorcentagemDesconto, ValorMinimoRegra FROM Cupons WHERE Codigo = @Codigo",
+		"""
+		SELECT
+			codigo AS Codigo,
+			percentual_desconto AS PorcentagemDesconto,
+			valor_minimo_regra AS ValorMinimoRegra
+		FROM cupons
+		WHERE codigo = @Codigo
+		""",
 		new { Codigo = codigo.Trim() });
 
 	return cupom is null ? Results.NotFound() : Results.Ok(cupom);
@@ -45,7 +61,7 @@ app.MapPost("/api/cupons", async (Cupom cupom, IDbConnection db) =>
 	var codigo = cupom.Codigo.Trim();
 
 	var count = await db.ExecuteScalarAsync<int>(
-		"SELECT COUNT(*) FROM Cupons WHERE Codigo = @Codigo",
+		"SELECT COUNT(*) FROM cupons WHERE codigo = @Codigo",
 		new { Codigo = codigo });
 
 	if (count > 0)
@@ -54,7 +70,7 @@ app.MapPost("/api/cupons", async (Cupom cupom, IDbConnection db) =>
 	}
 
 	await db.ExecuteAsync(
-		"INSERT INTO Cupons (Codigo, PorcentagemDesconto, ValorMinimoRegra) VALUES (@Codigo, @PorcentagemDesconto, @ValorMinimoRegra)",
+		"INSERT INTO cupons (codigo, percentual_desconto, valor_minimo_regra) VALUES (@Codigo, @PorcentagemDesconto, @ValorMinimoRegra)",
 		new
 		{
 			Codigo = codigo,
@@ -78,7 +94,7 @@ app.MapPut("/api/cupons/{codigo}", async (string codigo, Cupom cupom, IDbConnect
 	var codigoNovo = cupom.Codigo.Trim();
 
 	var codigoDuplicado = await db.ExecuteScalarAsync<int>(
-		"SELECT COUNT(*) FROM Cupons WHERE Codigo = @CodigoNovo AND Codigo <> @CodigoAtual",
+		"SELECT COUNT(*) FROM cupons WHERE codigo = @CodigoNovo AND codigo <> @CodigoAtual",
 		new { CodigoNovo = codigoNovo, CodigoAtual = codigoAtual });
 
 	if (codigoDuplicado > 0)
@@ -87,7 +103,7 @@ app.MapPut("/api/cupons/{codigo}", async (string codigo, Cupom cupom, IDbConnect
 	}
 
 	var rowsAffected = await db.ExecuteAsync(
-		"UPDATE Cupons SET Codigo = @Codigo, PorcentagemDesconto = @PorcentagemDesconto, ValorMinimoRegra = @ValorMinimoRegra WHERE Codigo = @CodigoAtual",
+		"UPDATE cupons SET codigo = @Codigo, percentual_desconto = @PorcentagemDesconto, valor_minimo_regra = @ValorMinimoRegra WHERE codigo = @CodigoAtual",
 		new
 		{
 			Codigo = codigoNovo,

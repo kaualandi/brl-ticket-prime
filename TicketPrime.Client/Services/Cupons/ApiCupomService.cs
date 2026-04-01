@@ -36,9 +36,9 @@ public sealed class ApiCupomService(HttpClient http) : ICupomService
         return [];
     }
 
-    public async Task<CupomListItem?> ObterPorCodigoAsync(string codigo, CancellationToken cancellationToken = default)
+    public async Task<CupomListItem?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        var response = await http.GetAsync($"/api/cupons/{Uri.EscapeDataString(codigo)}", cancellationToken);
+        var response = await http.GetAsync($"/api/cupons/{id}", cancellationToken);
 
         if (response.StatusCode == HttpStatusCode.NotFound)
         {
@@ -53,9 +53,9 @@ public sealed class ApiCupomService(HttpClient http) : ICupomService
         return null;
     }
 
-    public async Task<CriarCupomResult> AtualizarAsync(string codigoAtual, AtualizarCupomRequest request, CancellationToken cancellationToken = default)
+    public async Task<CriarCupomResult> AtualizarAsync(int id, AtualizarCupomRequest request, CancellationToken cancellationToken = default)
     {
-        var response = await http.PutAsJsonAsync($"/api/cupons/{Uri.EscapeDataString(codigoAtual)}", request, cancellationToken);
+        var response = await http.PutAsJsonAsync($"/api/cupons/{id}", request, cancellationToken);
 
         if (response.StatusCode == HttpStatusCode.OK)
         {

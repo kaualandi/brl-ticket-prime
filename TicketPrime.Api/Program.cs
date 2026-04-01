@@ -23,6 +23,7 @@ app.MapGet("/api/cupons", async (IDbConnection db) =>
 	var cupons = await db.QueryAsync<Cupom>(
 		"""
 		SELECT
+			id AS Id,
 			codigo AS Codigo,
 			percentual_desconto AS PorcentagemDesconto,
 			valor_minimo_regra AS ValorMinimoRegra
@@ -33,18 +34,19 @@ app.MapGet("/api/cupons", async (IDbConnection db) =>
 	return Results.Ok(cupons);
 });
 
-app.MapGet("/api/cupons/{codigo}", async (string codigo, IDbConnection db) =>
+app.MapGet("/api/cupons/{id:int}", async (int id, IDbConnection db) =>
 {
 	var cupom = await db.QueryFirstOrDefaultAsync<Cupom>(
 		"""
 		SELECT
+			id AS Id,
 			codigo AS Codigo,
 			percentual_desconto AS PorcentagemDesconto,
 			valor_minimo_regra AS ValorMinimoRegra
 		FROM cupons
-		WHERE codigo = @Codigo
+		WHERE id = @Id
 		""",
-		new { Codigo = codigo.Trim() });
+		new { Id = id });
 
 	return cupom is null ? Results.NotFound() : Results.Ok(cupom);
 });
@@ -69,8 +71,12 @@ app.MapPost("/api/cupons", async (Cupom cupom, IDbConnection db) =>
 		return Results.BadRequest("Código de cupom já cadastrado.");
 	}
 
-	await db.ExecuteAsync(
-		"INSERT INTO cupons (codigo, percentual_desconto, valor_minimo_regra) VALUES (@Codigo, @PorcentagemDesconto, @ValorMinimoRegra)",
+	var cupomId = await db.ExecuteScalarAsync<int>(
+		"""
+		INSERT INTO cupons (codigo, percentual_desconto, valor_minimo_regra)
+		OUTPUT INSERTED.id
+		VALUES (@Codigo, @PorcentagemDesconto, @ValorMinimoRegra)
+		""",
 		new
 		{
 			Codigo = codigo,
@@ -78,10 +84,10 @@ app.MapPost("/api/cupons", async (Cupom cupom, IDbConnection db) =>
 			cupom.ValorMinimoRegra
 		});
 
-	return Results.Created($"/api/cupons/{codigo}", null);
+	return Results.Created($"/api/cupons/{cupomId}", null);
 });
 
-app.MapPut("/api/cupons/{codigo}", async (string codigo, Cupom cupom, IDbConnection db) =>
+app.MapPut("/api/cupons/{id:int}", async (int id, Cupom cupom, IDbConnection db) =>
 {
 	var validationError = ValidateCupom(cupom);
 
@@ -90,12 +96,11 @@ app.MapPut("/api/cupons/{codigo}", async (string codigo, Cupom cupom, IDbConnect
 		return Results.BadRequest(validationError);
 	}
 
-	var codigoAtual = codigo.Trim();
 	var codigoNovo = cupom.Codigo.Trim();
 
 	var codigoDuplicado = await db.ExecuteScalarAsync<int>(
-		"SELECT COUNT(*) FROM cupons WHERE codigo = @CodigoNovo AND codigo <> @CodigoAtual",
-		new { CodigoNovo = codigoNovo, CodigoAtual = codigoAtual });
+		"SELECT COUNT(*) FROM cupons WHERE codigo = @CodigoNovo AND id <> @Id",
+		new { CodigoNovo = codigoNovo, Id = id });
 
 	if (codigoDuplicado > 0)
 	{
@@ -103,13 +108,13 @@ app.MapPut("/api/cupons/{codigo}", async (string codigo, Cupom cupom, IDbConnect
 	}
 
 	var rowsAffected = await db.ExecuteAsync(
-		"UPDATE cupons SET codigo = @Codigo, percentual_desconto = @PorcentagemDesconto, valor_minimo_regra = @ValorMinimoRegra WHERE codigo = @CodigoAtual",
+		"UPDATE cupons SET codigo = @Codigo, percentual_desconto = @PorcentagemDesconto, valor_minimo_regra = @ValorMinimoRegra WHERE id = @Id",
 		new
 		{
 			Codigo = codigoNovo,
 			cupom.PorcentagemDesconto,
 			cupom.ValorMinimoRegra,
-			CodigoAtual = codigoAtual
+			Id = id
 		});
 
 	if (rowsAffected == 0)

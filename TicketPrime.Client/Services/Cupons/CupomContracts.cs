@@ -16,6 +16,7 @@ public sealed class AtualizarCupomRequest
 
 public sealed class CupomListItem
 {
+    public int Id { get; set; }
     public string Codigo { get; set; } = string.Empty;
     public decimal PorcentagemDesconto { get; set; }
     public decimal ValorMinimoRegra { get; set; }

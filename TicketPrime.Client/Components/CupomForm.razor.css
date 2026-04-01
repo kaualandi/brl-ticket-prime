@@ -1,4 +1,4 @@
-.edit-coupon-page {
+.coupon-form-page {
     min-height: 100vh;
     padding: 32px 20px 48px;
     background:
@@ -6,19 +6,19 @@
         radial-gradient(circle at top right, rgba(15, 118, 110, 0.12), transparent 22rem);
 }
 
-.edit-coupon-shell {
+.coupon-form-shell {
     width: min(820px, 100%);
     margin: 0 auto;
     display: grid;
     gap: 24px;
 }
 
-.edit-coupon-header {
+.coupon-form-header {
     display: grid;
     gap: 12px;
 }
 
-.edit-coupon-eyebrow {
+.coupon-form-eyebrow {
     display: inline-flex;
     width: fit-content;
     padding: 8px 14px;
@@ -31,7 +31,7 @@
     text-transform: uppercase;
 }
 
-.edit-coupon-header h1 {
+.coupon-form-header h1 {
     margin: 0;
     color: #0f172a;
     font-size: clamp(2.1rem, 4vw, 3.4rem);
@@ -39,7 +39,7 @@
     letter-spacing: -0.05em;
 }
 
-.edit-coupon-header p {
+.coupon-form-header p {
     margin: 0;
     color: #475569;
     font-size: 1rem;
@@ -47,7 +47,7 @@
     max-width: 60ch;
 }
 
-.edit-coupon-card {
+.coupon-form-card {
     padding: 28px;
     border: 1px solid rgba(106, 125, 154, 0.16);
     border-radius: 28px;
@@ -85,12 +85,12 @@
 }
 
 @media (max-width: 720px) {
-    .edit-coupon-page {
+    .coupon-form-page {
         padding-inline: 14px;
         padding-top: 18px;
     }
 
-    .edit-coupon-card {
+    .coupon-form-card {
         padding: 22px;
         border-radius: 22px;
     }

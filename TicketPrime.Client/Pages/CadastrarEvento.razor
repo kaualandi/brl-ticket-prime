@@ -74,16 +74,21 @@
                                    For="@(() => form.DataEvento)"
                                    @bind-Date="form.DataEvento" />
 
-                    <MudTextField T="string"
+                    <MudNumericField T="decimal?"
                                   Label="Preço padrão"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Placeholder="R$ 0,00"
+                                  Min="0"
+                                  Culture="ptBr"
+                                  Format="N2"
+                                  Adornment="Adornment.Start"
+                                  AdornmentText="R$"
                                   InputMode="@(MudBlazor.InputMode.@decimal)"
                                   Immediate="true"
                                   FullWidth="true"
-                                  For="@(() => form.PrecoPadraoTexto)"
-                                  @bind-Value="form.PrecoPadraoTexto" />
+                                  For="@(() => form.PrecoPadrao)"
+                                  @bind-Value="form.PrecoPadrao" />
                 </div>
 
                 <div class="form-actions">
@@ -107,6 +112,7 @@
 </section>
 
 @code {
+    private static readonly CultureInfo ptBr = CultureInfo.GetCultureInfo("pt-BR");
     private readonly IMask dateMask = new DateMask("dd/MM/yyyy");
     private readonly CadastrarEventoFormModel form = new();
     private bool isSubmitting;

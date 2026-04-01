@@ -35,6 +35,7 @@
                           Variant="Variant.Outlined"
                           Margin="Margin.Dense"
                           FullWidth="true"
+                          Class="coupons-search"
                           Adornment="Adornment.Start"
                           AdornmentIcon="@Icons.Material.Filled.Search"
                           @bind-Value="searchTerm" />
@@ -54,21 +55,25 @@
                           Breakpoint="Breakpoint.Sm"
                           Class="coupons-table">
                     <HeaderContent>
-                        <MudTh>Codigo</MudTh>
+                        <MudTh>Código</MudTh>
                         <MudTh>Desconto</MudTh>
-                        <MudTh>Valor minimo</MudTh>
-                        <MudTh>Acoes</MudTh>
+                        <MudTh>Valor Mínimo</MudTh>
+                        <MudTh>Ações</MudTh>
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd DataLabel="Codigo">@context.Codigo</MudTd>
-                        <MudTd DataLabel="Desconto">@context.PorcentagemDesconto%</MudTd>
-                        <MudTd DataLabel="Valor minimo">@context.ValorMinimoRegra.ToString("C")</MudTd>
+                        <MudTd DataLabel="Desconto">@context.PorcentagemDesconto.ToString("N0")%</MudTd>
+                        <MudTd DataLabel="Valor minimo">@context.ValorMinimoRegra</MudTd>
                         <MudTd DataLabel="Acoes">
-                            <MudButton Variant="Variant.Text"
+                            <MudButton Class="action-button" Variant="Variant.Text"
                                        Color="Color.Primary"
                                        StartIcon="@Icons.Material.Filled.Edit"
-                                       OnClick="@(() => GoToEdit(context.Codigo))">
-                                Editar
+                                       OnClick="@(() => GoToEdit(context.Id))">
+                            </MudButton>
+                            <MudButton Class="action-button" Variant="Variant.Text"
+                                       Color="Color.Error"
+                                       StartIcon="@Icons.Material.Filled.Delete"
+                                       OnClick="@(() => GoToEdit(context.Id))">
                             </MudButton>
                         </MudTd>
                     </RowTemplate>
@@ -122,8 +127,8 @@
         Navigation.NavigateTo("/cupons/novo");
     }
 
-    private void GoToEdit(string codigo)
+    private void GoToEdit(int id)
     {
-        Navigation.NavigateTo($"/cupons/editar/{Uri.EscapeDataString(codigo)}");
+        Navigation.NavigateTo($"/cupons/editar/{id}");
     }
 }

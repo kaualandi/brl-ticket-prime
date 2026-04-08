@@ -31,14 +31,57 @@ O modelo iterativo divide o projeto em duas entregas funcionais (AV1 e AV2). Na 
 
 Para executar o projeto, é necessário ter instalado:
 
-- .NET 8 ou superior
-- SQL Server Express
-- SQL Server Management Studio (SSMS) ou Azure Data Studio
+- .NET 10 ou superior
+- Docker Desktop
 
 ## Configuração do banco
 
-Execute o script abaixo no SQL Server:
+1. Inicie o Docker Desktop e suba o SQL Server:
 
 ```bash
-db/ticketprime.sql
+docker compose up -d
+```
 
+2. Crie o banco e as tabelas:
+
+```bash
+docker exec ticketprime-sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'TicketPrime@2026' -C -Q "CREATE DATABASE TicketPrime;"
+
+docker exec ticketprime-sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'TicketPrime@2026' -C -d TicketPrime -Q "
+CREATE TABLE cupons (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    codigo VARCHAR(50) NOT NULL UNIQUE,
+    percentual_desconto DECIMAL(5,2) NOT NULL,
+    valor_minimo_regra DECIMAL(10,2) NOT NULL DEFAULT 0
+);
+
+CREATE TABLE Eventos (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Nome VARCHAR(200) NOT NULL,
+    Descricao VARCHAR(1000) NOT NULL DEFAULT '',
+    CapacidadeTotal INT NOT NULL,
+    DataEvento DATETIME NOT NULL,
+    PrecoPadrao DECIMAL(10,2) NOT NULL,
+    LocalEvento VARCHAR(200) NOT NULL DEFAULT ''
+);
+
+CREATE TABLE Usuarios (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Nome VARCHAR(200) NOT NULL,
+    Email VARCHAR(200) NOT NULL UNIQUE,
+    Senha VARCHAR(200) NOT NULL
+);
+"
+```
+
+## Executando o projeto
+
+Em terminais separados:
+
+```bash
+# API (http://localhost:5201)
+dotnet watch --project TicketPrime.Api --launch-profile http
+
+# Client Blazor (http://localhost:5272)
+dotnet watch --project TicketPrime.Client
+```

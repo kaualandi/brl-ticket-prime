@@ -1,0 +1,91 @@
+@page "/usuarios"
+@inject HttpClient Http
+
+<PageTitle>Usuários</PageTitle>
+
+<section class="users-page">
+    <div class="users-shell">
+        <div class="users-header">
+            <div>
+                <span class="users-eyebrow">Gestão de contas</span>
+                <h1>Usuários cadastrados</h1>
+                <p>Consulte os usuários registrados no sistema e acompanhe os cadastros.</p>
+            </div>
+        </div>
+
+        <MudPaper Class="users-card" Elevation="0">
+            <MudTextField T="string"
+                          Label="Buscar por nome ou email"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          FullWidth="true"
+                          Class="users-search"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          @bind-Value="_searchTerm" />
+
+            @if (_loading)
+            {
+                <div class="table-loading">
+                    <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                </div>
+            }
+            else
+            {
+                <MudTable T="UsuarioDto"
+                          Items="FilteredUsuarios"
+                          Hover="true"
+                          Breakpoint="Breakpoint.Sm"
+                          Class="users-table"
+                          Elevation="0">
+                    <HeaderContent>
+                        <MudTh>Nome</MudTh>
+                        <MudTh>Email</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Nome">@context.Nome</MudTd>
+                        <MudTd DataLabel="Email">@context.Email</MudTd>
+                    </RowTemplate>
+                    <NoRecordsContent>
+                        <MudText Typo="Typo.body1">Nenhum usuário encontrado.</MudText>
+                    </NoRecordsContent>
+                </MudTable>
+            }
+        </MudPaper>
+    </div>
+</section>
+
+@code {
+    private List<UsuarioDto> _usuarios = new();
+    private bool _loading = true;
+    private string _searchTerm = string.Empty;
+
+    private IEnumerable<UsuarioDto> FilteredUsuarios =>
+        _usuarios.Where(u => string.IsNullOrWhiteSpace(_searchTerm)
+            || u.Nome.Contains(_searchTerm.Trim(), StringComparison.OrdinalIgnoreCase)
+            || u.Email.Contains(_searchTerm.Trim(), StringComparison.OrdinalIgnoreCase));
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var result = await Http.GetFromJsonAsync<List<UsuarioDto>>("api/usuarios");
+            _usuarios = result ?? new();
+        }
+        catch
+        {
+            _usuarios = new();
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private class UsuarioDto
+    {
+        public int Id { get; set; }
+        public string Nome { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+    }
+}

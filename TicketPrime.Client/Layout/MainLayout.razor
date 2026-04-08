@@ -1,12 +1,57 @@
 @inherits LayoutComponentBase
 
-<MudThemeProvider />
+<MudThemeProvider Theme="_theme" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <MudLayout>
+    <MudAppBar Elevation="0" Style="background: #f6f8fc; color: #0f172a; border-bottom: 1px solid rgba(106,125,154,0.16);">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                       Color="Color.Inherit"
+                       Edge="Edge.Start"
+                       OnClick="ToggleDrawer" />
+        <MudText Typo="Typo.h6" Class="ml-2" Style="font-weight: 700; letter-spacing: -0.02em;">TicketPrime</MudText>
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="_drawerOpen"
+               ClipMode="DrawerClipMode.Always"
+               Breakpoint="Breakpoint.Md"
+               Elevation="2"
+               Variant="DrawerVariant.Responsive">
+        <MudNavMenu>
+            <MudNavLink Href="/eventos" Icon="@Icons.Material.Filled.Event">Eventos</MudNavLink>
+            <MudNavLink Href="/cupons" Icon="@Icons.Material.Filled.LocalOffer">Cupons</MudNavLink>
+            <MudNavLink Href="/usuarios" Icon="@Icons.Material.Filled.People">Usuários</MudNavLink>
+        </MudNavMenu>
+    </MudDrawer>
+
     <MudMainContent>
         @Body
     </MudMainContent>
 </MudLayout>
+
+@code {
+    private bool _drawerOpen = true;
+
+    private void ToggleDrawer()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    private readonly MudTheme _theme = new()
+    {
+        PaletteLight = new PaletteLight
+        {
+            Primary = "#0f766e",
+            AppbarBackground = "#0f766e",
+            DrawerBackground = "#f6f8fc",
+            DrawerText = "#0f172a",
+            DrawerIcon = "#475569"
+        },
+        PaletteDark = new PaletteDark
+        {
+            Primary = "#14b8a6"
+        }
+    };
+}

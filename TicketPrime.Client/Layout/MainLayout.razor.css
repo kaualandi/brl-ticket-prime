@@ -1,8 +1,4 @@
-:global(.mud-layout) {
-    background: transparent !important;
-}
-
-:global(.mud-main-content) {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
+::global(.mud-main-content) {
+  min-height: calc(100vh - 64px);
+  padding-top: 64px !important;
 }

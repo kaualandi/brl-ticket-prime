@@ -1,4 +1,4 @@
-.coupons-page {
+.users-page {
   min-height: 100vh;
   padding: 32px 20px 48px;
   background:
@@ -14,21 +14,21 @@
     );
 }
 
-.coupons-shell {
+.users-shell {
   width: min(980px, 100%);
   margin: 0 auto;
   display: grid;
   gap: 24px;
 }
 
-.coupons-header {
+.users-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   gap: 16px;
 }
 
-.coupons-eyebrow {
+.users-eyebrow {
   display: inline-flex;
   width: fit-content;
   padding: 8px 14px;
@@ -41,7 +41,7 @@
   text-transform: uppercase;
 }
 
-.coupons-header h1 {
+.users-header h1 {
   margin: 10px 0 0;
   color: #0f172a;
   font-size: clamp(1.8rem, 3vw, 2.6rem);
@@ -49,14 +49,14 @@
   letter-spacing: -0.04em;
 }
 
-.coupons-header p {
+.users-header p {
   margin: 12px 0 0;
   color: #475569;
   line-height: 1.6;
   max-width: 58ch;
 }
 
-::deep .coupons-card {
+::deep .users-card {
   padding: 28px;
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.82);
@@ -74,13 +74,13 @@
   min-height: 200px;
 }
 
-::deep .coupons-table .mud-table-container {
+::deep .users-table .mud-table-container {
   background: transparent !important;
   box-shadow: none !important;
   overflow-x: auto;
 }
 
-::deep .coupons-table thead th {
+::deep .users-table thead th {
   background: rgba(248, 250, 252, 0.86) !important;
   color: #64748b;
   font-size: 0.78rem;
@@ -91,38 +91,33 @@
   border-bottom: none !important;
 }
 
-::deep .coupons-table tbody td {
+::deep .users-table tbody td {
   padding: 18px 20px;
   color: #0f172a;
   font-size: 0.95rem;
   border-bottom: 1px solid rgba(148, 163, 184, 0.12) !important;
 }
 
-::deep .coupons-table tbody tr:last-child td {
+::deep .users-table tbody tr:last-child td {
   border-bottom: none !important;
 }
 
-::deep .coupons-table tbody tr:hover td {
+::deep .users-table tbody tr:hover td {
   background: rgba(15, 118, 110, 0.04) !important;
 }
 
-::deep .mud-button .mud-button-label .mud-button-icon-start {
-  margin: 0 !important;
-  margin-inline: 0 !important;
-}
-
 @media (max-width: 720px) {
-  .coupons-page {
+  .users-page {
     padding-inline: 14px;
     padding-top: 18px;
   }
 
-  .coupons-header {
+  .users-header {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .coupons-card {
+  .users-card {
     padding: 18px;
     border-radius: 18px;
   }

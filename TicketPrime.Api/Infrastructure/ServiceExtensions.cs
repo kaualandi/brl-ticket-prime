@@ -1,6 +1,7 @@
 using Microsoft.Data.SqlClient;
 using System.Data;
 using TicketPrime.Api.Features.Eventos;
+using TicketPrime.Api.Features.Usuarios;
 
 namespace TicketPrime.Api.Infrastructure;
 
@@ -19,6 +20,7 @@ public static class ServiceExtensions
         this IServiceCollection services)
     {
         services.AddScoped<IEventoRepository, EventoRepository>();
+        services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
         return services;
     }

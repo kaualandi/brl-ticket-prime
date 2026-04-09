@@ -18,6 +18,6 @@ public class CreateEventoRequest
 
     public DateTime DataEvento { get; set; }
 
-    [Range(typeof(decimal), "0.01", "999999999")]
+    [Range(0.01, 999999999, ErrorMessage = "O preco padrao deve ser maior que zero.")]
     public decimal PrecoPadrao { get; set; }
 }

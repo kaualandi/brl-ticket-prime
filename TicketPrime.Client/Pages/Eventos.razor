@@ -1,5 +1,10 @@
 @page "/eventos"
 @using TicketPrime.Client.Models
+@using TicketPrime.Client.Services.Eventos
+@inject IEventoService EventoService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
 
 <PageTitle>Eventos</PageTitle>
 
@@ -24,19 +29,43 @@
                         <span class="metric-label">Locais confirmados</span>
                     </div>
                     <div class="metric-card">
-                        <span class="metric-value">@ProximoEvento.DataEvento.ToString("dd MMM")</span>
+                        <span class="metric-value">@(eventos.Count > 0 ? ProximoEvento.DataEvento.ToString("dd MMM") : "-")</span>
                         <span class="metric-label">Próxima data</span>
                     </div>
                 </div>
             </div>
 
-            <EventoCard EventoItem="ProximoEvento"
-                        Destacado="true"
-                        Hero="true"
-                        BadgeText="Próximo destaque" />
+            @if (eventos.Count > 0)
+            {
+                <EventoCard EventoItem="ProximoEvento"
+                            Destacado="true"
+                            Hero="true"
+                            BadgeText="Próximo destaque" />
+            }
         </section>
 
-        @if (eventos.Count == 0)
+        <div class="events-actions-bar">
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Add"
+                       OnClick="@(() => Navigation.NavigateTo("/eventos/novo"))">
+                Novo evento
+            </MudButton>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="table-loading">
+                <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            </div>
+        }
+        else if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <MudAlert Severity="Severity.Error" Dense="true" Variant="Variant.Filled">
+                @errorMessage
+            </MudAlert>
+        }
+        else if (eventos.Count == 0)
         {
             <section class="empty-state">
                 <h2>Nenhum evento encontrado</h2>
@@ -49,10 +78,23 @@
                 @foreach (var evento in eventosOrdenados)
                 {
                     var destaque = evento.Id == ProximoEvento.Id;
-
-                    <EventoCard EventoItem="evento"
-                                Destacado="destaque"
-                                BadgeText="@(destaque ? "Mais próximo" : "Agenda aberta")" />
+                    <div class="event-card-wrapper">
+                        <EventoCard EventoItem="evento"
+                                    Destacado="destaque"
+                                    BadgeText="@(destaque ? "Mais próximo" : "Agenda aberta")" />
+                        <div class="event-card-actions">
+                            <MudButton Variant="Variant.Text"
+                                       Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Filled.Edit"
+                                       OnClick="@(() => Navigation.NavigateTo($"/eventos/editar/{evento.Id}"))">
+                            </MudButton>
+                            <MudButton Variant="Variant.Text"
+                                       Color="Color.Error"
+                                       StartIcon="@Icons.Material.Filled.Delete"
+                                       OnClick="@(() => DeleteEvento(evento.Id))">
+                            </MudButton>
+                        </div>
+                    </div>
                 }
             </section>
         }
@@ -60,29 +102,9 @@
 </section>
 
 @code {
-    private readonly List<Evento> eventos = new()
-    {
-        new Evento
-        {
-            Id = 1,
-            Nome = "Semana da Tecnologia",
-            Descricao = "Uma imersão em inovação, produto e engenharia com talks práticos e networking de alto nível.",
-            CapacidadeTotal = 450,
-            DataEvento = new DateTime(2026, 3, 30),
-            PrecoPadrao = 149.90m,
-            LocalEvento = "Auditório Central"
-        },
-        new Evento
-        {
-            Id = 2,
-            Nome = "Palestra API",
-            Descricao = "Boas práticas para APIs REST bem modeladas, sustentáveis e prontas para escalar.",
-            CapacidadeTotal = 120,
-            DataEvento = new DateTime(2026, 4, 2),
-            PrecoPadrao = 89.90m,
-            LocalEvento = "Sala 204"
-        }
-    };
+    private List<Evento> eventos = new();
+    private bool isLoading = true;
+    private string? errorMessage;
 
     private List<Evento> eventosOrdenados => eventos.OrderBy(e => e.DataEvento).ToList();
 
@@ -101,4 +123,63 @@
         .Where(local => !string.IsNullOrWhiteSpace(local))
         .Distinct(StringComparer.OrdinalIgnoreCase)
         .Count();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEventosAsync();
+    }
+
+    private async Task LoadEventosAsync()
+    {
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            var data = await EventoService.ListarAsync();
+            eventos = data.Select(e => new Evento
+            {
+                Id = e.Id,
+                Nome = e.Nome,
+                Descricao = e.Descricao,
+                CapacidadeTotal = e.CapacidadeTotal,
+                DataEvento = e.DataEvento,
+                PrecoPadrao = e.PrecoPadrao,
+                LocalEvento = e.LocalEvento
+            }).ToList();
+        }
+        catch
+        {
+            errorMessage = "Não foi possível carregar os eventos agora.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task DeleteEvento(int id)
+    {
+        var options = new MessageBoxOptions
+        {
+            Title = "Confirmar exclusão",
+            Message = "Tem certeza que deseja excluir este evento?",
+            YesText = "Excluir",
+            CancelText = "Cancelar"
+        };
+
+        var confirm = await DialogService.ShowMessageBoxAsync(options);
+        if (confirm != true) return;
+
+        var result = await EventoService.DeletarAsync(id);
+        if (result.Success)
+        {
+            eventos.RemoveAll(e => e.Id == id);
+            Snackbar.Add("Evento excluído com sucesso!", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add(result.ErrorMessage ?? "Erro ao excluir evento.", Severity.Error);
+        }
+    }
 }

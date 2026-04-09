@@ -1,0 +1,225 @@
+@page "/eventos/editar/{Id:int}"
+@using System.ComponentModel.DataAnnotations
+@using System.Globalization
+@using TicketPrime.Client.Services.Eventos
+@inject IEventoService EventoService
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
+
+<PageTitle>Editar Evento</PageTitle>
+
+<section class="create-event-page">
+    <div class="create-event-shell">
+        <div class="create-event-header">
+            <span class="create-event-eyebrow">Operação de eventos</span>
+            <h1>Editar evento</h1>
+            <p>Altere os dados do evento e salve para publicar as atualizações.</p>
+        </div>
+
+        @if (isLoadingEvent)
+        {
+            <div class="table-loading">
+                <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            </div>
+        }
+        else if (notFound)
+        {
+            <MudAlert Severity="Severity.Error" Dense="true" Variant="Variant.Filled">
+                Evento não encontrado.
+            </MudAlert>
+        }
+        else
+        {
+            <MudPaper Class="create-event-card" Elevation="0">
+                @if (!string.IsNullOrWhiteSpace(errorMessage))
+                {
+                    <MudAlert Severity="Severity.Error" Dense="true" Variant="Variant.Filled" Class="mb-4">
+                        @errorMessage
+                    </MudAlert>
+                }
+
+                <EditForm Model="@form" OnValidSubmit="@HandleSubmitAsync">
+                    <DataAnnotationsValidator />
+
+                    <div class="form-grid">
+                        <MudTextField T="string"
+                                      Label="Nome"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      FullWidth="true"
+                                      For="@(() => form.Nome)"
+                                      @bind-Value="form.Nome" />
+
+                        <MudTextField T="string"
+                                      Label="Local do evento"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      FullWidth="true"
+                                      For="@(() => form.LocalEvento)"
+                                      @bind-Value="form.LocalEvento" />
+
+                        <MudTextField T="string"
+                                      Label="Descrição"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Lines="4"
+                                      FullWidth="true"
+                                      Class="form-field-span-2"
+                                      For="@(() => form.Descricao)"
+                                      @bind-Value="form.Descricao" />
+
+                        <MudNumericField T="int?"
+                                         Label="Capacidade total"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Min="1"
+                                         FullWidth="true"
+                                         For="@(() => form.CapacidadeTotal)"
+                                         @bind-Value="form.CapacidadeTotal" />
+
+                        <MudDatePicker Label="Data do evento"
+                                       Variant="Variant.Outlined"
+                                       Margin="Margin.Dense"
+                                       Editable="true"
+                                       DateFormat="dd/MM/yyyy"
+                                       Mask="@dateMask"
+                                       For="@(() => form.DataEvento)"
+                                       @bind-Date="form.DataEvento" />
+
+                        <MudNumericField T="decimal?"
+                                      Label="Preço padrão"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Placeholder="R$ 0,00"
+                                      Min="0"
+                                      Culture="ptBr"
+                                      Format="N2"
+                                      Adornment="Adornment.Start"
+                                      AdornmentText="R$"
+                                      InputMode="@(MudBlazor.InputMode.@decimal)"
+                                      Immediate="true"
+                                      FullWidth="true"
+                                      For="@(() => form.PrecoPadrao)"
+                                      @bind-Value="form.PrecoPadrao" />
+                    </div>
+
+                    <div class="form-actions">
+                        <MudButton ButtonType="ButtonType.Submit"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Disabled="@isSubmitting">
+                            @(isSubmitting ? "Salvando..." : "Salvar alterações")
+                        </MudButton>
+
+                        <MudButton Variant="Variant.Text"
+                                   Color="Color.Default"
+                                   Disabled="@isSubmitting"
+                                   OnClick="@Cancel">
+                            Cancelar
+                        </MudButton>
+                    </div>
+                </EditForm>
+            </MudPaper>
+        }
+    </div>
+</section>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private static readonly CultureInfo ptBr = CultureInfo.GetCultureInfo("pt-BR");
+    private readonly IMask dateMask = new DateMask("dd/MM/yyyy");
+    private readonly EditarEventoFormModel form = new();
+    private bool isLoadingEvent = true;
+    private bool isSubmitting;
+    private bool notFound;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var evento = await EventoService.ObterPorIdAsync(Id);
+
+        if (evento is null)
+        {
+            notFound = true;
+            isLoadingEvent = false;
+            return;
+        }
+
+        form.Nome = evento.Nome;
+        form.Descricao = evento.Descricao;
+        form.LocalEvento = evento.LocalEvento;
+        form.CapacidadeTotal = evento.CapacidadeTotal;
+        form.DataEvento = evento.DataEvento;
+        form.PrecoPadrao = evento.PrecoPadrao;
+
+        isLoadingEvent = false;
+    }
+
+    private async Task HandleSubmitAsync()
+    {
+        isSubmitting = true;
+        errorMessage = null;
+
+        try
+        {
+            var request = new SalvarEventoRequest
+            {
+                Nome = form.Nome.Trim(),
+                Descricao = form.Descricao.Trim(),
+                LocalEvento = form.LocalEvento.Trim(),
+                CapacidadeTotal = form.CapacidadeTotal!.Value,
+                DataEvento = form.DataEvento!.Value,
+                PrecoPadrao = form.PrecoPadrao!.Value
+            };
+
+            var result = await EventoService.AtualizarAsync(Id, request);
+
+            if (result.Success)
+            {
+                Snackbar.Add("Evento atualizado com sucesso.", Severity.Success);
+                Navigation.NavigateTo("/eventos");
+                return;
+            }
+
+            errorMessage = result.ErrorMessage ?? "Nao foi possivel atualizar o evento agora.";
+        }
+        catch
+        {
+            errorMessage = "Falha ao comunicar com a API de eventos.";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/eventos");
+    }
+
+    private sealed class EditarEventoFormModel
+    {
+        [Required(ErrorMessage = "Informe o nome do evento.")]
+        public string Nome { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Informe o local do evento.")]
+        public string LocalEvento { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Informe a descricao do evento.")]
+        public string Descricao { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Informe a capacidade total.")]
+        [Range(1, int.MaxValue, ErrorMessage = "A capacidade total deve ser maior que zero.")]
+        public int? CapacidadeTotal { get; set; }
+
+        [Required(ErrorMessage = "Informe a data do evento.")]
+        public DateTime? DataEvento { get; set; }
+
+        [Required(ErrorMessage = "Informe o preco padrao.")]
+        [Range(0.01, 999999999, ErrorMessage = "O preco padrao deve ser maior que zero.")]
+        public decimal? PrecoPadrao { get; set; }
+    }
+}

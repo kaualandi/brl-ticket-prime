@@ -125,6 +125,19 @@ app.MapPut("/api/cupons/{id:int}", async (int id, Cupom cupom, IDbConnection db)
 	return Results.Ok();
 });
 
+app.MapDelete("/api/cupons/{id:int}", async (int id, IDbConnection db) =>
+{
+	var rowsAffected = await db.ExecuteAsync(
+		"DELETE FROM cupons WHERE id = @Id", new { Id = id });
+
+	if (rowsAffected == 0)
+	{
+		return Results.NotFound();
+	}
+
+	return Results.NoContent();
+});
+
 static string? ValidateCupom(Cupom cupom)
 {
 	if (string.IsNullOrWhiteSpace(cupom.Codigo))

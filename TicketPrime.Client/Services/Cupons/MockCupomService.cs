@@ -88,4 +88,13 @@ public sealed class MockCupomService : ICupomService
 
         return Task.FromResult(CriarCupomResult.Ok());
     }
+
+    public Task<CriarCupomResult> DeletarAsync(int id, CancellationToken cancellationToken = default)
+    {
+        var removed = Cupons.RemoveAll(c => c.Id == id);
+
+        return removed > 0
+            ? Task.FromResult(CriarCupomResult.Ok())
+            : Task.FromResult(CriarCupomResult.Fail("Cupom nao encontrado."));
+    }
 }

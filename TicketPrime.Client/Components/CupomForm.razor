@@ -52,13 +52,11 @@
                                          Class="percent-field"
                                          Culture="ptBr"
                                          Format="N0"
-                                         Immediate="true"
                                          Adornment="Adornment.End"
                                          AdornmentText="%"
                                          FullWidth="true"
                                          For="@(() => form.PorcentagemDesconto)"
-                                         @bind-Value="form.PorcentagemDesconto"
-                                         @bind-Value:after="EnsurePorcentagemMin" />
+                                         @bind-Value="form.PorcentagemDesconto" />
 
                         <MudNumericField T="decimal?"
                                          Label="Valor minimo da regra"
@@ -70,10 +68,8 @@
                                          Adornment="Adornment.Start"
                                          AdornmentText="R$"
                                          FullWidth="true"
-                                         InputMode="@(MudBlazor.InputMode.@decimal)"
                                          For="@(() => form.ValorMinimoRegra)"
-                                         @bind-Value="form.ValorMinimoRegra"
-                                         @bind-Value:after="EnsureValorMinimoMin" />
+                                         @bind-Value="form.ValorMinimoRegra" />
                     </div>
 
                     <div class="form-actions">
@@ -244,16 +240,6 @@
     private void Cancel()
     {
         Navigation.NavigateTo("/cupons");
-    }
-
-    private void EnsurePorcentagemMin()
-    {
-        form.PorcentagemDesconto ??= 1;
-    }
-
-    private void EnsureValorMinimoMin()
-    {
-        form.ValorMinimoRegra ??= 0;
     }
 
     private sealed class CupomFormModel

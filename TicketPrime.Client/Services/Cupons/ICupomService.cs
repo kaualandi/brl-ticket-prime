@@ -6,4 +6,5 @@ public interface ICupomService
     Task<IReadOnlyList<CupomListItem>> ListarAsync(CancellationToken cancellationToken = default);
     Task<CupomListItem?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default);
     Task<CriarCupomResult> AtualizarAsync(int id, AtualizarCupomRequest request, CancellationToken cancellationToken = default);
+    Task<CriarCupomResult> DeletarAsync(int id, CancellationToken cancellationToken = default);
 }

@@ -2,6 +2,8 @@
 @using TicketPrime.Client.Services.Cupons
 @inject ICupomService CupomService
 @inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
 
 <PageTitle>Cupons</PageTitle>
 
@@ -73,7 +75,7 @@
                             <MudButton Class="action-button" Variant="Variant.Text"
                                        Color="Color.Error"
                                        StartIcon="@Icons.Material.Filled.Delete"
-                                       OnClick="@(() => GoToEdit(context.Id))">
+                                       OnClick="@(() => DeleteCupom(context.Id))">
                             </MudButton>
                         </MudTd>
                     </RowTemplate>
@@ -130,5 +132,30 @@
     private void GoToEdit(int id)
     {
         Navigation.NavigateTo($"/cupons/editar/{id}");
+    }
+
+    private async Task DeleteCupom(int id)
+    {
+        var options = new MessageBoxOptions
+        {
+            Title = "Confirmar exclusão",
+            Message = "Tem certeza que deseja excluir este cupom?",
+            YesText = "Excluir",
+            CancelText = "Cancelar"
+        };
+
+        var confirm = await DialogService.ShowMessageBoxAsync(options);
+        if (confirm != true) return;
+
+        var result = await CupomService.DeletarAsync(id);
+        if (result.Success)
+        {
+            cupons.RemoveAll(c => c.Id == id);
+            Snackbar.Add("Cupom excluído com sucesso!", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add(result.ErrorMessage ?? "Erro ao excluir cupom.", Severity.Error);
+        }
     }
 }

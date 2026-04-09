@@ -70,7 +70,6 @@
                                    Editable="true"
                                    DateFormat="dd/MM/yyyy"
                                    Mask="@dateMask"
-                                   InputMode="@(MudBlazor.InputMode.numeric)"
                                    For="@(() => form.DataEvento)"
                                    @bind-Date="form.DataEvento" />
 
@@ -78,14 +77,12 @@
                                   Label="Preço padrão"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
-                                  Placeholder="R$ 0,00"
+                                  Placeholder="0,00"
                                   Min="0"
                                   Culture="ptBr"
                                   Format="N2"
                                   Adornment="Adornment.Start"
                                   AdornmentText="R$"
-                                  InputMode="@(MudBlazor.InputMode.@decimal)"
-                                  Immediate="true"
                                   FullWidth="true"
                                   For="@(() => form.PrecoPadrao)"
                                   @bind-Value="form.PrecoPadrao" />
@@ -140,7 +137,7 @@
             if (response.StatusCode == HttpStatusCode.Created)
             {
                 Snackbar.Add("Evento cadastrado com sucesso.", Severity.Success);
-                form.Reset();
+                Navigation.NavigateTo("/eventos");
                 return;
             }
 
@@ -235,21 +232,8 @@
         public DateTime? DataEvento { get; set; }
 
         [Required(ErrorMessage = "Informe o preco padrao.")]
-        [Range(typeof(decimal), "0.01", "999999999", ErrorMessage = "O preco padrao deve ser maior que zero.")]
+        [Range(0.01, 999999999, ErrorMessage = "O preco padrao deve ser maior que zero.")]
         public decimal? PrecoPadrao { get; set; }
-
-        [Required(ErrorMessage = "Informe o preco padrao.")]
-        public string PrecoPadraoTexto
-        {
-            get => _precoPadraoTexto;
-            set
-            {
-                _precoPadraoTexto = FormatCurrencyInput(value);
-                PrecoPadrao = TryParseCurrency(_precoPadraoTexto);
-            }
-        }
-
-        private string _precoPadraoTexto = string.Empty;
 
         public void Reset()
         {
@@ -259,31 +243,6 @@
             CapacidadeTotal = null;
             DataEvento = null;
             PrecoPadrao = null;
-            PrecoPadraoTexto = string.Empty;
-        }
-
-        private static string FormatCurrencyInput(string? input)
-        {
-            var digits = new string((input ?? string.Empty).Where(char.IsDigit).ToArray());
-
-            if (string.IsNullOrEmpty(digits))
-            {
-                return string.Empty;
-            }
-
-            var cents = decimal.Parse(digits) / 100m;
-            return cents.ToString("C", CultureInfo.GetCultureInfo("pt-BR"));
-        }
-
-        private static decimal? TryParseCurrency(string input)
-        {
-            return decimal.TryParse(
-                input,
-                NumberStyles.Currency,
-                CultureInfo.GetCultureInfo("pt-BR"),
-                out var parsedValue)
-                ? parsedValue
-                : null;
         }
     }
 

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
 using TicketPrime.Client;
 using TicketPrime.Client.Services.Cupons;
+using TicketPrime.Client.Services.Eventos;
+using TicketPrime.Client.Services.Usuarios;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -13,6 +15,12 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://
 
 // Coupon flow connected to API.
 builder.Services.AddScoped<ICupomService, ApiCupomService>();
+
+// Evento flow connected to API.
+builder.Services.AddScoped<IEventoService, ApiEventoService>();
+
+// Usuario flow connected to API.
+builder.Services.AddScoped<IUsuarioService, ApiUsuarioService>();
 
 // MudBlazor
 builder.Services.AddMudServices();

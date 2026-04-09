@@ -1,5 +1,8 @@
 @page "/usuarios"
 @inject HttpClient Http
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
 
 <PageTitle>Usuários</PageTitle>
 
@@ -11,6 +14,13 @@
                 <h1>Usuários cadastrados</h1>
                 <p>Consulte os usuários registrados no sistema e acompanhe os cadastros.</p>
             </div>
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Add"
+                       OnClick="@(() => Navigation.NavigateTo("/usuarios/novo"))">
+                Novo usuário
+            </MudButton>
         </div>
 
         <MudPaper Class="users-card" Elevation="0">
@@ -41,10 +51,25 @@
                     <HeaderContent>
                         <MudTh>Nome</MudTh>
                         <MudTh>Email</MudTh>
+                        <MudTh>CPF</MudTh>
+                        <MudTh>Ações</MudTh>
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd DataLabel="Nome">@context.Nome</MudTd>
                         <MudTd DataLabel="Email">@context.Email</MudTd>
+                        <MudTd DataLabel="CPF">@context.Cpf</MudTd>
+                        <MudTd DataLabel="Ações">
+                            <MudButton Variant="Variant.Text"
+                                       Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Filled.Edit"
+                                       OnClick="@(() => Navigation.NavigateTo($"/usuarios/editar/{context.Id}"))">
+                            </MudButton>
+                            <MudButton Variant="Variant.Text"
+                                       Color="Color.Error"
+                                       StartIcon="@Icons.Material.Filled.Delete"
+                                       OnClick="@(() => DeleteUsuario(context.Id))">
+                            </MudButton>
+                        </MudTd>
                     </RowTemplate>
                     <NoRecordsContent>
                         <MudText Typo="Typo.body1">Nenhum usuário encontrado.</MudText>
@@ -87,5 +112,39 @@
         public int Id { get; set; }
         public string Nome { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
+        public string Cpf { get; set; } = string.Empty;
+    }
+
+    private async Task DeleteUsuario(int id)
+    {
+        var options = new MessageBoxOptions
+        {
+            Title = "Confirmar exclusão",
+            Message = "Tem certeza que deseja excluir este usuário?",
+            YesText = "Excluir",
+            CancelText = "Cancelar"
+        };
+
+        var confirm = await DialogService.ShowMessageBoxAsync(options);
+
+        if (confirm != true) return;
+
+        try
+        {
+            var response = await Http.DeleteAsync($"api/usuarios/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                _usuarios.RemoveAll(u => u.Id == id);
+                Snackbar.Add("Usuário excluído com sucesso!", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add("Erro ao excluir usuário.", Severity.Error);
+            }
+        }
+        catch
+        {
+            Snackbar.Add("Erro de conexão com o servidor.", Severity.Error);
+        }
     }
 }

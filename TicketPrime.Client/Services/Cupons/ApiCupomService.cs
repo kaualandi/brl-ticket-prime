@@ -75,6 +75,19 @@ public sealed class ApiCupomService(HttpClient http) : ICupomService
         return CriarCupomResult.Fail("Nao foi possivel atualizar o cupom agora. Tente novamente em instantes.");
     }
 
+    public async Task<CriarCupomResult> DeletarAsync(int id, CancellationToken cancellationToken = default)
+    {
+        var response = await http.DeleteAsync($"/api/cupons/{id}", cancellationToken);
+
+        if (response.StatusCode == HttpStatusCode.NoContent)
+            return CriarCupomResult.Ok();
+
+        if (response.StatusCode == HttpStatusCode.NotFound)
+            return CriarCupomResult.Fail("Cupom nao encontrado.");
+
+        return CriarCupomResult.Fail("Nao foi possivel excluir o cupom agora. Tente novamente em instantes.");
+    }
+
     private static async Task<string> ExtractErrorMessageAsync(HttpResponseMessage response, CancellationToken cancellationToken)
     {
         var rawContent = await response.Content.ReadAsStringAsync(cancellationToken);

@@ -1,0 +1,146 @@
+@page "/usuarios/novo"
+@using System.ComponentModel.DataAnnotations
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
+
+<PageTitle>Cadastrar Usuário</PageTitle>
+
+<section class="user-form-page">
+    <div class="user-form-shell">
+        <div class="user-form-header">
+            <span class="user-form-eyebrow">Gestão de contas</span>
+            <h1>Cadastrar novo usuário</h1>
+            <p>Preencha os dados abaixo para registrar um novo usuário no sistema.</p>
+        </div>
+
+        <MudPaper Class="user-form-card" Elevation="0">
+            @if (!string.IsNullOrWhiteSpace(_errorMessage))
+            {
+                <MudAlert Severity="Severity.Error" Dense="true" Variant="Variant.Filled" Class="mb-4">
+                    @_errorMessage
+                </MudAlert>
+            }
+
+            <EditForm Model="@_form" OnValidSubmit="@HandleSubmitAsync">
+                <DataAnnotationsValidator />
+
+                <div class="form-grid">
+                    <MudTextField T="string"
+                                  Label="Nome"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  FullWidth="true"
+                                  For="@(() => _form.Nome)"
+                                  @bind-Value="_form.Nome" />
+
+                    <MudTextField T="string"
+                                  Label="Email"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  FullWidth="true"
+                                  InputType="InputType.Email"
+                                  For="@(() => _form.Email)"
+                                  @bind-Value="_form.Email" />
+
+                    <MudTextField T="string"
+                                  Label="Senha"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  FullWidth="true"
+                                  InputType="InputType.Password"
+                                  For="@(() => _form.Senha)"
+                                  @bind-Value="_form.Senha" />
+
+                    <MudTextField T="string"
+                                  Label="CPF"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  FullWidth="true"
+                                  Placeholder="000.000.000-00"
+                                  For="@(() => _form.Cpf)"
+                                  @bind-Value="_form.Cpf" />
+                </div>
+
+                <div class="form-actions">
+                    <MudButton ButtonType="ButtonType.Submit"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Disabled="@_isSubmitting">
+                        @(_isSubmitting ? "Cadastrando..." : "Cadastrar")
+                    </MudButton>
+
+                    <MudButton Variant="Variant.Text"
+                               Color="Color.Default"
+                               Disabled="@_isSubmitting"
+                               OnClick="@(() => Navigation.NavigateTo("/usuarios"))">
+                        Cancelar
+                    </MudButton>
+                </div>
+            </EditForm>
+        </MudPaper>
+    </div>
+</section>
+
+@code {
+    private UsuarioFormModel _form = new();
+    private bool _isSubmitting;
+    private string? _errorMessage;
+
+    private async Task HandleSubmitAsync()
+    {
+        _isSubmitting = true;
+        _errorMessage = null;
+
+        try
+        {
+            var payload = new
+            {
+                Nome = _form.Nome!.Trim(),
+                Email = _form.Email!.Trim(),
+                Senha = _form.Senha,
+                Cpf = _form.Cpf!.Trim()
+            };
+
+            var response = await Http.PostAsJsonAsync("api/usuarios", payload);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Usuário cadastrado com sucesso!", Severity.Success);
+                Navigation.NavigateTo("/usuarios");
+            }
+            else
+            {
+                var body = await response.Content.ReadAsStringAsync();
+                _errorMessage = string.IsNullOrWhiteSpace(body)
+                    ? "Erro ao cadastrar usuário."
+                    : body.Trim('"');
+            }
+        }
+        catch
+        {
+            _errorMessage = "Erro de conexão com o servidor.";
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+
+    private class UsuarioFormModel
+    {
+        [Required(ErrorMessage = "Nome é obrigatório.")]
+        public string? Nome { get; set; }
+
+        [Required(ErrorMessage = "Email é obrigatório.")]
+        [EmailAddress(ErrorMessage = "Email inválido.")]
+        public string? Email { get; set; }
+
+        [Required(ErrorMessage = "Senha é obrigatória.")]
+        [MinLength(6, ErrorMessage = "Senha deve ter pelo menos 6 caracteres.")]
+        public string? Senha { get; set; }
+
+        [Required(ErrorMessage = "CPF é obrigatório.")]
+        public string? Cpf { get; set; }
+    }
+}

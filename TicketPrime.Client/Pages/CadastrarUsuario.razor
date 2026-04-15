@@ -58,6 +58,7 @@
                                   Margin="Margin.Dense"
                                   FullWidth="true"
                                   Placeholder="000.000.000-00"
+                                  Mask="@(new PatternMask("000.000.000-00"))"
                                   For="@(() => _form.Cpf)"
                                   @bind-Value="_form.Cpf" />
                 </div>

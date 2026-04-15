@@ -1,0 +1,399 @@
+/* ══════════════════════════════════════════
+   Home page — TicketPrime
+   ══════════════════════════════════════════ */
+
+.home-page {
+  --accent: #0f766e;
+  --accent-soft: rgba(15, 118, 110, 0.12);
+  --text-strong: #0f172a;
+  --text-body: #475569;
+  --text-soft: #64748b;
+}
+
+/* ── Shared buttons ── */
+.home-btn-primary,
+.home-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 26px;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 150ms ease;
+  white-space: nowrap;
+}
+
+.home-btn-primary {
+  color: #fff;
+  background: var(--accent);
+}
+
+.home-btn-primary:hover {
+  background: #115e59;
+  box-shadow: 0 6px 20px rgba(15, 118, 110, 0.32);
+  transform: translateY(-1px);
+}
+
+.home-btn-ghost {
+  color: var(--accent);
+  border: 1.5px solid rgba(15, 118, 110, 0.3);
+  background: transparent;
+}
+
+.home-btn-ghost:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.home-btn-lg {
+  padding: 14px 36px;
+  font-size: 1.05rem;
+}
+
+/* ── Eyebrow ── */
+.home-eyebrow,
+.home-section-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* ════════════════
+   Hero
+   ════════════════ */
+.home-hero {
+  min-height: calc(100vh - 64px);
+  padding: 60px 20px 80px;
+  background:
+    radial-gradient(
+      circle at 10% 20%,
+      rgba(14, 165, 233, 0.14),
+      transparent 30rem
+    ),
+    radial-gradient(
+      circle at 90% 10%,
+      rgba(15, 118, 110, 0.16),
+      transparent 28rem
+    ),
+    linear-gradient(180deg, #f6f8fc 0%, #eef2f8 100%);
+  display: flex;
+  align-items: center;
+}
+
+.home-hero-inner {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.9fr);
+  gap: 40px;
+  align-items: center;
+}
+
+.home-hero-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.home-hero-copy h1 {
+  margin: 0;
+  color: var(--text-strong);
+  font-size: clamp(2.8rem, 5vw, 5rem);
+  line-height: 0.96;
+  letter-spacing: -0.05em;
+  font-family:
+    "Aptos Display", "Segoe UI Variable Display", "Trebuchet MS", sans-serif;
+}
+
+.home-hero-copy h1 em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+.home-hero-copy p {
+  margin: 0;
+  color: var(--text-body);
+  font-size: 1.1rem;
+  line-height: 1.7;
+  max-width: 48ch;
+}
+
+.home-hero-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.home-hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.stat-pill {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(106, 125, 154, 0.16);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+}
+
+.stat-pill strong {
+  color: var(--text-strong);
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.stat-pill span {
+  color: var(--text-soft);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.home-hero-card {
+  height: 100%;
+  min-height: 420px;
+}
+
+.home-hero-skeleton {
+  border-radius: 28px;
+  background: linear-gradient(
+    135deg,
+    rgba(14, 165, 233, 0.1),
+    rgba(15, 118, 110, 0.08)
+  );
+  min-height: 420px;
+  animation: skeleton-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ════════════════
+   Sections
+   ════════════════ */
+.home-section {
+  padding: 72px 20px;
+  background: #f6f8fc;
+}
+
+.home-section-alt {
+  background: #eef2f8;
+}
+
+.home-section-inner {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  display: grid;
+  gap: 32px;
+}
+
+.home-section-header {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+}
+
+.home-section-header h2 {
+  margin: 0;
+  color: var(--text-strong);
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-family:
+    "Aptos Display", "Segoe UI Variable Display", "Trebuchet MS", sans-serif;
+}
+
+.home-section-eyebrow {
+  align-self: center;
+}
+
+.home-section-link {
+  margin-left: auto;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 999px;
+  transition: background 130ms ease;
+}
+
+.home-section-link:hover {
+  background: var(--accent-soft);
+}
+
+/* ── Carousel ── */
+.home-carousel {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 4px;
+  padding-bottom: 12px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.home-carousel::-webkit-scrollbar {
+  height: 4px;
+}
+
+.home-carousel::-webkit-scrollbar-track {
+  background: rgba(148, 163, 184, 0.1);
+  border-radius: 999px;
+}
+
+.home-carousel::-webkit-scrollbar-thumb {
+  background: rgba(15, 118, 110, 0.3);
+  border-radius: 999px;
+}
+
+.home-carousel-item {
+  flex: 0 0 300px;
+  scroll-snap-align: start;
+}
+
+/* ── Grid ── */
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* ── CTA Banner ── */
+.home-cta-banner {
+  padding: 80px 20px;
+  background:
+    radial-gradient(
+      circle at 20% 50%,
+      rgba(14, 165, 233, 0.14),
+      transparent 24rem
+    ),
+    radial-gradient(
+      circle at 80% 50%,
+      rgba(15, 118, 110, 0.18),
+      transparent 22rem
+    ),
+    linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.home-cta-inner {
+  width: min(700px, 100%);
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.home-cta-inner h2 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  font-family:
+    "Aptos Display", "Segoe UI Variable Display", "Trebuchet MS", sans-serif;
+}
+
+.home-cta-inner p {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  max-width: 46ch;
+}
+
+/* ── Empty state ── */
+.home-empty {
+  padding: 100px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-empty-inner {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.home-empty-icon {
+  font-size: 3.5rem;
+  line-height: 1;
+}
+
+.home-empty-inner h2 {
+  margin: 0;
+  color: var(--text-strong);
+  font-size: 1.8rem;
+  letter-spacing: -0.04em;
+}
+
+.home-empty-inner p {
+  margin: 0;
+  color: var(--text-body);
+  max-width: 44ch;
+  line-height: 1.7;
+}
+
+/* ── Responsive ── */
+@media (max-width: 960px) {
+  .home-hero-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .home-hero-card {
+    min-height: unset;
+  }
+
+  .home-hero {
+    min-height: unset;
+    padding: 50px 20px 60px;
+  }
+}
+
+@media (max-width: 720px) {
+  .home-hero {
+    padding: 36px 14px 48px;
+  }
+
+  .home-section {
+    padding: 48px 14px;
+  }
+
+  .home-cta-banner {
+    padding: 56px 14px;
+  }
+
+  .home-carousel-item {
+    flex: 0 0 270px;
+  }
+}

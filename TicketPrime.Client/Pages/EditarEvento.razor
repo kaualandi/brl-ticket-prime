@@ -101,6 +101,16 @@
                                       FullWidth="true"
                                       For="@(() => form.PrecoPadrao)"
                                       @bind-Value="form.PrecoPadrao" />
+
+                        <MudTextField T="string"
+                                      Label="URL da imagem"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Placeholder="https://exemplo.com/imagem.jpg"
+                                      FullWidth="true"
+                                      Class="form-field-span-2"
+                                      For="@(() => form.ImageUrl)"
+                                      @bind-Value="form.ImageUrl" />
                     </div>
 
                     <div class="form-actions">
@@ -153,6 +163,7 @@
         form.CapacidadeTotal = evento.CapacidadeTotal;
         form.DataEvento = evento.DataEvento;
         form.PrecoPadrao = evento.PrecoPadrao;
+        form.ImageUrl = evento.ImageUrl;
 
         isLoadingEvent = false;
     }
@@ -171,7 +182,8 @@
                 LocalEvento = form.LocalEvento.Trim(),
                 CapacidadeTotal = form.CapacidadeTotal!.Value,
                 DataEvento = form.DataEvento!.Value,
-                PrecoPadrao = form.PrecoPadrao!.Value
+                PrecoPadrao = form.PrecoPadrao!.Value,
+                ImageUrl = form.ImageUrl?.Trim() ?? string.Empty
             };
 
             var result = await EventoService.AtualizarAsync(Id, request);
@@ -221,5 +233,7 @@
         [Required(ErrorMessage = "Informe o preco padrao.")]
         [Range(0.01, 999999999, ErrorMessage = "O preco padrao deve ser maior que zero.")]
         public decimal? PrecoPadrao { get; set; }
+
+        public string ImageUrl { get; set; } = string.Empty;
     }
 }

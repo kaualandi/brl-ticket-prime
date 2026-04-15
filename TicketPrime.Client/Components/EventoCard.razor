@@ -1,36 +1,61 @@
 @using TicketPrime.Client.Models
 
-<article class="event-card @(Destacado ? "event-card-featured" : string.Empty) @(Hero ? "event-card-hero" : string.Empty)">
-    <div class="event-card-top">
-        <span class="event-badge">@BadgeText</span>
-        <span class="event-date">@EventoItem.DataEvento.ToString("dd/MM/yyyy")</span>
-    </div>
+<article class="event-card @(Destacado ? "event-card-featured" : string.Empty) @(Hero ? "event-card-hero" : string.Empty) @(HasImage ? "event-card-has-image" : string.Empty)"
+         @onclick="HandleClick"
+         style="@(OnClick.HasDelegate ? "cursor:pointer" : string.Empty)">
 
-    <div class="event-card-body">
-        <h3>@EventoItem.Nome</h3>
-        <p>@EventoItem.Descricao</p>
-    </div>
+    @if (HasImage)
+    {
+        <div class="event-card-image">
+            <img src="@EventoItem.ImageUrl" alt="@EventoItem.Nome" loading="lazy" />
+        </div>
+    }
+    else
+    {
+        <div class="event-card-image event-card-image-placeholder">
+            <span class="image-placeholder-eyebrow">TicketPrime</span>
+        </div>
+    }
 
-    <div class="event-card-meta">
-        <div class="meta-item">
-            <span class="footer-label">Capacidade</span>
-            <strong>@EventoItem.CapacidadeTotal pessoas</strong>
+    <div class="event-card-content">
+        <div class="event-card-top">
+            <span class="event-badge">@BadgeText</span>
+            <span class="event-date">@EventoItem.DataEvento.ToString("dd/MM/yyyy")</span>
         </div>
-        <div class="meta-item">
-            <span class="footer-label">Preço padrão</span>
-            <strong>@EventoItem.PrecoPadrao.ToString("C", ptBr)</strong>
-        </div>
-    </div>
 
-    <div class="event-card-footer">
-        <div class="footer-item">
-            <span class="footer-label">Local</span>
-            <strong>@EventoItem.LocalEvento</strong>
+        <div class="event-card-body">
+            <h3>@EventoItem.Nome</h3>
+            <p>@EventoItem.Descricao</p>
         </div>
-        <div class="footer-item">
-            <span class="footer-label">Dia</span>
-            <strong>@EventoItem.DataEvento.ToString(Hero ? "dddd, dd 'de' MMMM" : "dddd", ptBr)</strong>
+
+        <div class="event-card-meta">
+            <div class="meta-item">
+                <span class="footer-label">Capacidade</span>
+                <strong>@EventoItem.CapacidadeTotal pessoas</strong>
+            </div>
+            <div class="meta-item">
+                <span class="footer-label">Preço padrão</span>
+                <strong>@EventoItem.PrecoPadrao.ToString("C", ptBr)</strong>
+            </div>
         </div>
+
+        <div class="event-card-footer">
+            <div class="footer-item">
+                <span class="footer-label">Local</span>
+                <strong>@EventoItem.LocalEvento</strong>
+            </div>
+            <div class="footer-item">
+                <span class="footer-label">Dia</span>
+                <strong>@EventoItem.DataEvento.ToString(Hero ? "dddd, dd 'de' MMMM" : "dddd", ptBr)</strong>
+            </div>
+        </div>
+
+        @if (ShowActions)
+        {
+            <div class="event-card-actions-slot">
+                @ActionsContent
+            </div>
+        }
     </div>
 </article>
 
@@ -48,4 +73,21 @@
 
     [Parameter]
     public string BadgeText { get; set; } = "Agenda aberta";
+
+    [Parameter]
+    public bool ShowActions { get; set; }
+
+    [Parameter]
+    public RenderFragment? ActionsContent { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    private bool HasImage => !string.IsNullOrWhiteSpace(EventoItem.ImageUrl);
+
+    private async Task HandleClick()
+    {
+        if (OnClick.HasDelegate)
+            await OnClick.InvokeAsync();
+    }
 }

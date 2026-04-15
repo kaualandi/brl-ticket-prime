@@ -9,6 +9,7 @@ public sealed class EventoListItem
     public DateTime DataEvento { get; set; }
     public decimal PrecoPadrao { get; set; }
     public string LocalEvento { get; set; } = string.Empty;
+    public string ImageUrl { get; set; } = string.Empty;
 }
 
 public sealed class SalvarEventoRequest
@@ -19,6 +20,7 @@ public sealed class SalvarEventoRequest
     public int CapacidadeTotal { get; set; }
     public DateTime DataEvento { get; set; }
     public decimal PrecoPadrao { get; set; }
+    public string ImageUrl { get; set; } = string.Empty;
 }
 
 public sealed class EventoResult

@@ -62,7 +62,8 @@ public class EventosController : ControllerBase
             LocalEvento = request.LocalEvento.Trim(),
             CapacidadeTotal = request.CapacidadeTotal,
             DataEvento = request.DataEvento,
-            PrecoPadrao = request.PrecoPadrao
+            PrecoPadrao = request.PrecoPadrao,
+            ImageUrl = request.ImageUrl?.Trim() ?? string.Empty
         };
 
         evento.Id = await _repo.AddAsync(evento);
@@ -110,7 +111,8 @@ public class EventosController : ControllerBase
             LocalEvento = request.LocalEvento.Trim(),
             CapacidadeTotal = request.CapacidadeTotal,
             DataEvento = request.DataEvento,
-            PrecoPadrao = request.PrecoPadrao
+            PrecoPadrao = request.PrecoPadrao,
+            ImageUrl = request.ImageUrl?.Trim() ?? string.Empty
         };
 
         var rows = await _repo.UpdateAsync(evento);

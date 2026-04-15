@@ -1,0 +1,180 @@
+@page "/explorar"
+@layout PublicLayout
+@using TicketPrime.Client.Models
+@using TicketPrime.Client.Services.Eventos
+@using TicketPrime.Client.Components
+@inject IEventoService EventoService
+@inject NavigationManager Navigation
+
+<PageTitle>Explorar Eventos — TicketPrime</PageTitle>
+
+<div class="explorar-page">
+    <!-- Hero header -->
+    <section class="explorar-hero">
+        <div class="explorar-hero-content">
+            <h1>Explorar eventos</h1>
+            <p>Encontre o próximo evento perfeito para você</p>
+            <div class="explorar-search-bar">
+                <span class="explorar-search-icon">🔍</span>
+                <input class="explorar-search-input"
+                       type="text"
+                       placeholder="Pesquisar por nome ou local…"
+                       @bind="searchQuery"
+                       @bind:event="oninput" />
+                @if (!string.IsNullOrEmpty(searchQuery))
+                {
+                    <button class="explorar-search-clear" @onclick="() => searchQuery = string.Empty">✕</button>
+                }
+            </div>
+        </div>
+    </section>
+
+    <!-- Filters + results -->
+    <section class="explorar-body">
+        <div class="explorar-body-inner">
+
+            <!-- Filter bar -->
+            <div class="explorar-filters">
+                <span class="explorar-filter-label">Ordenar:</span>
+                <div class="explorar-chip-group">
+                    <button class="explorar-chip @(sortMode == "date" ? "explorar-chip--active" : "")"
+                            @onclick='() => sortMode = "date"'>
+                        📅 Mais próximos
+                    </button>
+                    <button class="explorar-chip @(sortMode == "price-asc" ? "explorar-chip--active" : "")"
+                            @onclick='() => sortMode = "price-asc"'>
+                        💸 Menor preço
+                    </button>
+                    <button class="explorar-chip @(sortMode == "price-desc" ? "explorar-chip--active" : "")"
+                            @onclick='() => sortMode = "price-desc"'>
+                        💎 Maior preço
+                    </button>
+                </div>
+
+                @if (localOptions.Count > 1)
+                {
+                    <span class="explorar-filter-label explorar-filter-label--gap">Local:</span>
+                    <div class="explorar-chip-group">
+                        <button class="explorar-chip @(string.IsNullOrEmpty(localFilter) ? "explorar-chip--active" : "")"
+                                @onclick='() => localFilter = string.Empty'>
+                            Todos
+                        </button>
+                        @foreach (var local in localOptions)
+                        {
+                            var localCap = local;
+                            <button class="explorar-chip @(localFilter == localCap ? "explorar-chip--active" : "")"
+                                    @onclick="() => localFilter = localCap">
+                                📍 @local
+                            </button>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Results count -->
+            @if (!isLoading)
+            {
+                <p class="explorar-count">
+                    <strong>@FilteredEventos.Count</strong> evento@(FilteredEventos.Count != 1 ? "s" : "") encontrado@(FilteredEventos.Count != 1 ? "s" : "")
+                </p>
+            }
+
+            <!-- Cards grid -->
+            @if (isLoading)
+            {
+                <div class="explorar-loading">
+                    <MudProgressCircular Color="MudBlazor.Color.Primary" Indeterminate="true" Size="MudBlazor.Size.Large" />
+                </div>
+            }
+            else if (!FilteredEventos.Any())
+            {
+                <div class="explorar-empty">
+                    <span class="explorar-empty-icon">🎭</span>
+                    <h2>Nenhum evento encontrado</h2>
+                    <p>Tente ajustar os filtros ou a pesquisa.</p>
+                    <button class="explorar-btn-reset" @onclick="ResetFilters">Limpar filtros</button>
+                </div>
+            }
+            else
+            {
+                <div class="explorar-grid">
+                    @foreach (var evento in FilteredEventos)
+                    {
+                        var ev = evento;
+                        <EventoCard EventoItem="ev" OnClick="() => NavigateToEvento(ev.Id)" />
+                    }
+                </div>
+            }
+        </div>
+    </section>
+</div>
+
+@code {
+    private bool isLoading = true;
+    private List<Evento> allEventos = new();
+    private string searchQuery = string.Empty;
+    private string sortMode = "date";
+    private string localFilter = string.Empty;
+
+    private List<string> localOptions => allEventos
+        .Select(e => e.LocalEvento)
+        .Where(l => !string.IsNullOrWhiteSpace(l))
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .OrderBy(l => l)
+        .ToList();
+
+    private List<Evento> FilteredEventos
+    {
+        get
+        {
+            var q = searchQuery.Trim();
+            var result = allEventos.AsEnumerable();
+
+            if (!string.IsNullOrEmpty(q))
+                result = result.Where(e =>
+                    e.Nome.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                    e.LocalEvento.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                    e.Descricao.Contains(q, StringComparison.OrdinalIgnoreCase));
+
+            if (!string.IsNullOrEmpty(localFilter))
+                result = result.Where(e => e.LocalEvento.Equals(localFilter, StringComparison.OrdinalIgnoreCase));
+
+            result = sortMode switch
+            {
+                "price-asc" => result.OrderBy(e => e.PrecoPadrao),
+                "price-desc" => result.OrderByDescending(e => e.PrecoPadrao),
+                _ => result.OrderBy(e => e.DataEvento)
+            };
+
+            return result.ToList();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var items = await EventoService.ListarAsync();
+        allEventos = items
+            .Select(e => new Evento
+            {
+                Id = e.Id,
+                Nome = e.Nome,
+                Descricao = e.Descricao,
+                CapacidadeTotal = e.CapacidadeTotal,
+                DataEvento = e.DataEvento,
+                PrecoPadrao = e.PrecoPadrao,
+                LocalEvento = e.LocalEvento,
+                ImageUrl = e.ImageUrl
+            })
+            .ToList();
+        isLoading = false;
+    }
+
+    private void NavigateToEvento(int id) => Navigation.NavigateTo("/evento/" + id);
+
+    private void ResetFilters()
+    {
+        searchQuery = string.Empty;
+        localFilter = string.Empty;
+        sortMode = "date";
+    }
+}

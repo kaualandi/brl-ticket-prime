@@ -78,22 +78,25 @@
                 @foreach (var evento in eventosOrdenados)
                 {
                     var destaque = evento.Id == ProximoEvento.Id;
+                    var eventoCapturado = evento;
                     <div class="event-card-wrapper">
                         <EventoCard EventoItem="evento"
                                     Destacado="destaque"
-                                    BadgeText="@(destaque ? "Mais próximo" : "Agenda aberta")" />
-                        <div class="event-card-actions">
-                            <MudButton Variant="Variant.Text"
-                                       Color="Color.Primary"
-                                       StartIcon="@Icons.Material.Filled.Edit"
-                                       OnClick="@(() => Navigation.NavigateTo($"/eventos/editar/{evento.Id}"))">
-                            </MudButton>
-                            <MudButton Variant="Variant.Text"
-                                       Color="Color.Error"
-                                       StartIcon="@Icons.Material.Filled.Delete"
-                                       OnClick="@(() => DeleteEvento(evento.Id))">
-                            </MudButton>
-                        </div>
+                                    ShowActions="true"
+                                    BadgeText="@(destaque ? "Mais próximo" : "Agenda aberta")">
+                            <ActionsContent>
+                                <MudButton Variant="Variant.Text"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Material.Filled.Edit"
+                                           OnClick="@(() => Navigation.NavigateTo($"/eventos/editar/{eventoCapturado.Id}"))">
+                                </MudButton>
+                                <MudButton Variant="Variant.Text"
+                                           Color="Color.Error"
+                                           StartIcon="@Icons.Material.Filled.Delete"
+                                           OnClick="@(() => DeleteEvento(eventoCapturado.Id))">
+                                </MudButton>
+                            </ActionsContent>
+                        </EventoCard>
                     </div>
                 }
             </section>
@@ -145,7 +148,8 @@
                 CapacidadeTotal = e.CapacidadeTotal,
                 DataEvento = e.DataEvento,
                 PrecoPadrao = e.PrecoPadrao,
-                LocalEvento = e.LocalEvento
+                LocalEvento = e.LocalEvento,
+                ImageUrl = e.ImageUrl
             }).ToList();
         }
         catch

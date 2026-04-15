@@ -14,20 +14,20 @@ public class EventoRepository : IEventoRepository
 
     public async Task<IEnumerable<Evento>> GetAllAsync()
     {
-        return await _db.QueryAsync<Evento>("SELECT * FROM Eventos");
+        return await _db.QueryAsync<Evento>("SELECT Id, Nome, Descricao, CapacidadeTotal, DataEvento, PrecoPadrao, LocalEvento, ImageUrl FROM Eventos");
     }
 
     public async Task<Evento?> GetByIdAsync(int id)
     {
         return await _db.QueryFirstOrDefaultAsync<Evento>(
-            "SELECT * FROM Eventos WHERE Id = @Id", new { Id = id });
+            "SELECT Id, Nome, Descricao, CapacidadeTotal, DataEvento, PrecoPadrao, LocalEvento, ImageUrl FROM Eventos WHERE Id = @Id", new { Id = id });
     }
 
     public async Task<int> AddAsync(Evento evento)
     {
         const string sql = """
-            INSERT INTO Eventos (Nome, Descricao, CapacidadeTotal, DataEvento, PrecoPadrao, LocalEvento)
-            VALUES (@Nome, @Descricao, @CapacidadeTotal, @DataEvento, @PrecoPadrao, @LocalEvento);
+            INSERT INTO Eventos (Nome, Descricao, CapacidadeTotal, DataEvento, PrecoPadrao, LocalEvento, ImageUrl)
+            VALUES (@Nome, @Descricao, @CapacidadeTotal, @DataEvento, @PrecoPadrao, @LocalEvento, @ImageUrl);
             SELECT CAST(SCOPE_IDENTITY() AS INT);
             """;
 
@@ -39,7 +39,8 @@ public class EventoRepository : IEventoRepository
         const string sql = """
             UPDATE Eventos
             SET Nome = @Nome, Descricao = @Descricao, CapacidadeTotal = @CapacidadeTotal,
-                DataEvento = @DataEvento, PrecoPadrao = @PrecoPadrao, LocalEvento = @LocalEvento
+                DataEvento = @DataEvento, PrecoPadrao = @PrecoPadrao, LocalEvento = @LocalEvento,
+                ImageUrl = @ImageUrl
             WHERE Id = @Id
             """;
 

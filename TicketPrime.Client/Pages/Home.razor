@@ -1,7 +1,177 @@
 ﻿@page "/"
+@layout PublicLayout
+@using TicketPrime.Client.Models
+@using TicketPrime.Client.Services.Eventos
+@inject IEventoService EventoService
+@inject NavigationManager Navigation
 
-<PageTitle>Home</PageTitle>
+<PageTitle>TicketPrime — Encontre experiências inesquecíveis</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="home-page">
 
-Welcome to your new app.
+    <!-- ── Hero ── -->
+    <section class="home-hero">
+        <div class="home-hero-inner">
+            <div class="home-hero-copy">
+                <span class="home-eyebrow">Plataforma de ingressos</span>
+                <h1>Encontre experiências <em>inesquecíveis</em></h1>
+                <p>
+                    Dos shows mais aguardados às noites que ficam na memória.
+                    Descubra, compare e garanta seu lugar antes que acabe.
+                </p>
+                <div class="home-hero-ctas">
+                    <a class="home-btn-primary" href="/explorar">Explorar eventos</a>
+                    <a class="home-btn-ghost" href="/registrar">Criar conta grátis</a>
+                </div>
+
+                @if (!isLoading && eventos.Count > 0)
+                {
+                    <div class="home-hero-stats">
+                        <div class="stat-pill">
+                            <strong>@eventos.Count</strong>
+                            <span>eventos</span>
+                        </div>
+                        <div class="stat-pill">
+                            <strong>@LocaisUnicos</strong>
+                            <span>@(LocaisUnicos == 1 ? "local" : "locais")</span>
+                        </div>
+                        <div class="stat-pill">
+                            <strong>@(ProximoEvento.DataEvento.ToString("dd MMM", ptBr))</strong>
+                            <span>próximo</span>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @if (!isLoading && eventos.Count > 0)
+            {
+                <div class="home-hero-card">
+                    <EventoCard EventoItem="ProximoEvento"
+                                Destacado="true"
+                                Hero="true"
+                                BadgeText="Próximo destaque"
+                                OnClick="@(() => Navigation.NavigateTo($"/evento/{ProximoEvento.Id}"))" />
+                </div>
+            }
+            else if (isLoading)
+            {
+                <div class="home-hero-skeleton"></div>
+            }
+        </div>
+    </section>
+
+    @if (!isLoading && eventos.Count > 0)
+    {
+        <!-- ── Em destaque (carousel) ── -->
+        <section class="home-section">
+            <div class="home-section-inner">
+                <div class="home-section-header">
+                    <span class="home-section-eyebrow">Em destaque</span>
+                    <h2>Os próximos eventos</h2>
+                    <a class="home-section-link" href="/explorar">Ver todos →</a>
+                </div>
+                <div class="home-carousel" role="list">
+                    @foreach (var evento in eventosOrdenados.Take(6))
+                    {
+                        var e = evento;
+                        <div class="home-carousel-item" role="listitem">
+                            <EventoCard EventoItem="e"
+                                        BadgeText="Agenda aberta"
+                                        OnClick="@(() => Navigation.NavigateTo($"/evento/{e.Id}"))" />
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <!-- ── Todos os eventos (grid) ── -->
+        @if (eventosOrdenados.Count > 6)
+        {
+            <section class="home-section home-section-alt">
+                <div class="home-section-inner">
+                    <div class="home-section-header">
+                        <span class="home-section-eyebrow">Agenda completa</span>
+                        <h2>Todos os eventos</h2>
+                    </div>
+                    <div class="home-grid">
+                        @foreach (var evento in eventosOrdenados.Skip(6))
+                        {
+                            var e = evento;
+                            <EventoCard EventoItem="e"
+                                        BadgeText="Agenda aberta"
+                                        OnClick="@(() => Navigation.NavigateTo($"/evento/{e.Id}"))" />
+                        }
+                    </div>
+                </div>
+            </section>
+        }
+
+        <!-- ── CTA banner ── -->
+        <section class="home-cta-banner">
+            <div class="home-cta-inner">
+                <h2>Não perca nenhum evento</h2>
+                <p>Crie sua conta gratuitamente e fique sempre por dentro da programação.</p>
+                <a class="home-btn-primary home-btn-lg" href="/registrar">Começar agora</a>
+            </div>
+        </section>
+    }
+    else if (!isLoading && eventos.Count == 0)
+    {
+        <section class="home-empty">
+            <div class="home-empty-inner">
+                <span class="home-empty-icon">🎟</span>
+                <h2>Nenhum evento disponível</h2>
+                <p>Novos eventos serão publicados em breve. Crie sua conta para receber atualizações.</p>
+                <a class="home-btn-primary" href="/registrar">Criar conta</a>
+            </div>
+        </section>
+    }
+</div>
+
+@code {
+    private readonly System.Globalization.CultureInfo ptBr = new("pt-BR");
+    private List<Evento> eventos = new();
+    private bool isLoading = true;
+
+    private List<Evento> eventosOrdenados => eventos
+        .OrderBy(e => e.DataEvento)
+        .ToList();
+
+    private Evento ProximoEvento => eventosOrdenados.FirstOrDefault() ?? new Evento
+    {
+        Nome = "Sem eventos",
+        Descricao = "Nenhum evento cadastrado no momento.",
+        CapacidadeTotal = 0,
+        DataEvento = DateTime.Today,
+        PrecoPadrao = 0m,
+        LocalEvento = "A definir"
+    };
+
+    private int LocaisUnicos => eventos
+        .Select(e => e.LocalEvento)
+        .Where(l => !string.IsNullOrWhiteSpace(l))
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .Count();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var data = await EventoService.ListarAsync();
+            eventos = data.Select(e => new Evento
+            {
+                Id = e.Id,
+                Nome = e.Nome,
+                Descricao = e.Descricao,
+                CapacidadeTotal = e.CapacidadeTotal,
+                DataEvento = e.DataEvento,
+                PrecoPadrao = e.PrecoPadrao,
+                LocalEvento = e.LocalEvento,
+                ImageUrl = e.ImageUrl
+            }).ToList();
+        }
+        catch { /* API unavailable — show empty state */ }
+        finally { isLoading = false; }
+    }
+}
+

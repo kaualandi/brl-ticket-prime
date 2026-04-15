@@ -62,7 +62,8 @@ CREATE TABLE Eventos (
     CapacidadeTotal INT NOT NULL,
     DataEvento DATETIME NOT NULL,
     PrecoPadrao DECIMAL(10,2) NOT NULL,
-    LocalEvento VARCHAR(200) NOT NULL DEFAULT ''
+    LocalEvento VARCHAR(200) NOT NULL DEFAULT '',
+    ImageUrl VARCHAR(500) NOT NULL DEFAULT ''
 );
 
 CREATE TABLE Usuarios (
@@ -73,6 +74,20 @@ CREATE TABLE Usuarios (
     Cpf VARCHAR(14) NOT NULL DEFAULT ''
 );
 "
+```
+
+3. Se o banco já existia sem a coluna `ImageUrl`, execute a migration:
+
+```bash
+docker exec ticketprime-sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'TicketPrime@2026' -C -d TicketPrime -Q "ALTER TABLE Eventos ADD ImageUrl VARCHAR(500) NOT NULL DEFAULT '';"
+```
+
+## Seed de dados
+
+Para popular o banco com 8 eventos de exemplo:
+
+```bash
+docker exec -i ticketprime-sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'TicketPrime@2026' -C -d TicketPrime < seed.sql
 ```
 
 ## Executando o projeto

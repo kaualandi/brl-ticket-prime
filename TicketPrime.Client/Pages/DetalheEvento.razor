@@ -1,0 +1,171 @@
+@page "/evento/{Id:int}"
+@layout PublicLayout
+@using TicketPrime.Client.Models
+@using TicketPrime.Client.Services.Eventos
+@inject IEventoService EventoService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>@(evento != null ? evento.Nome + " — TicketPrime" : "Evento — TicketPrime")</PageTitle>
+
+<div class="detail-page">
+
+    @if (isLoading)
+    {
+        <div class="detail-loading">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" />
+        </div>
+    }
+    else if (notFound)
+    {
+        <div class="detail-not-found">
+            <span class="detail-nf-icon">🎟</span>
+            <h1>Evento não encontrado</h1>
+            <p>Este evento pode ter sido removido ou o link está incorreto.</p>
+            <a class="detail-btn-back" href="/explorar">← Ver todos os eventos</a>
+        </div>
+    }
+    else if (evento != null)
+    {
+        <!-- Hero with image or gradient -->
+        <div class="detail-hero @(HasImage ? "detail-hero-img" : "detail-hero-gradient")"
+             style="@(HasImage ? $"--event-image: url('{evento.ImageUrl}')" : string.Empty)">
+            <div class="detail-hero-overlay"></div>
+            <div class="detail-hero-content">
+                <a class="detail-back-link" href="/explorar">← Voltar aos eventos</a>
+                <div class="detail-hero-badges">
+                    <span class="detail-badge">@evento.DataEvento.ToString("dd 'de' MMMM 'de' yyyy", ptBr)</span>
+                    <span class="detail-badge detail-badge-location">📍 @evento.LocalEvento</span>
+                </div>
+                <h1>@evento.Nome</h1>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="detail-body">
+            <div class="detail-body-inner">
+
+                <!-- Left: description + details -->
+                <div class="detail-main">
+                    <section class="detail-section">
+                        <h2>Sobre o evento</h2>
+                        <p class="detail-description">@evento.Descricao</p>
+                    </section>
+
+                    <section class="detail-section">
+                        <h2>Detalhes</h2>
+                        <div class="detail-meta-grid">
+                            <div class="detail-meta-item">
+                                <span class="detail-meta-icon">📅</span>
+                                <div>
+                                    <span class="detail-meta-label">Data</span>
+                                    <strong>@evento.DataEvento.ToString("dddd, dd 'de' MMMM 'de' yyyy", ptBr)</strong>
+                                </div>
+                            </div>
+                            <div class="detail-meta-item">
+                                <span class="detail-meta-icon">📍</span>
+                                <div>
+                                    <span class="detail-meta-label">Local</span>
+                                    <strong>@evento.LocalEvento</strong>
+                                </div>
+                            </div>
+                            <div class="detail-meta-item">
+                                <span class="detail-meta-icon">👥</span>
+                                <div>
+                                    <span class="detail-meta-label">Capacidade</span>
+                                    <strong>@evento.CapacidadeTotal.ToString("N0", ptBr) pessoas</strong>
+                                </div>
+                            </div>
+                            <div class="detail-meta-item">
+                                <span class="detail-meta-icon">🎫</span>
+                                <div>
+                                    <span class="detail-meta-label">Ingresso</span>
+                                    <strong>@evento.PrecoPadrao.ToString("C", ptBr)</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Right: purchase card -->
+                <aside class="detail-sidebar">
+                    <div class="detail-purchase-card">
+                        <div class="purchase-header">
+                            <span class="purchase-eyebrow">Preço por ingresso</span>
+                            <span class="purchase-price">@evento.PrecoPadrao.ToString("C", ptBr)</span>
+                        </div>
+
+                        <div class="purchase-divider"></div>
+
+                        <div class="purchase-info">
+                            <div class="purchase-info-row">
+                                <span>Data</span>
+                                <strong>@evento.DataEvento.ToString("dd/MM/yyyy")</strong>
+                            </div>
+                            <div class="purchase-info-row">
+                                <span>Local</span>
+                                <strong>@evento.LocalEvento</strong>
+                            </div>
+                            <div class="purchase-info-row">
+                                <span>Capacidade</span>
+                                <strong>@evento.CapacidadeTotal.ToString("N0", ptBr)</strong>
+                            </div>
+                        </div>
+
+                        <div class="purchase-divider"></div>
+
+                        <button class="purchase-btn" @onclick="HandleComprar">
+                            Comprar ingresso
+                        </button>
+
+                        <p class="purchase-note">🔒 Pagamento seguro e garantido</p>
+                    </div>
+                </aside>
+
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private readonly System.Globalization.CultureInfo ptBr = new("pt-BR");
+    private Evento? evento;
+    private bool isLoading = true;
+    private bool notFound;
+
+    private bool HasImage => !string.IsNullOrWhiteSpace(evento?.ImageUrl);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var data = await EventoService.ObterPorIdAsync(Id);
+
+        if (data is null)
+        {
+            notFound = true;
+        }
+        else
+        {
+            evento = new Evento
+            {
+                Id = data.Id,
+                Nome = data.Nome,
+                Descricao = data.Descricao,
+                CapacidadeTotal = data.CapacidadeTotal,
+                DataEvento = data.DataEvento,
+                PrecoPadrao = data.PrecoPadrao,
+                LocalEvento = data.LocalEvento,
+                ImageUrl = data.ImageUrl
+            };
+        }
+
+        isLoading = false;
+    }
+
+    private void HandleComprar()
+    {
+        Snackbar.Add("🎟 Funcionalidade de compra em breve!", Severity.Info);
+    }
+}

@@ -1,0 +1,115 @@
+@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+
+<MudThemeProvider Theme="_theme" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<div class="public-layout">
+    <!-- Navbar -->
+    <header class="pub-navbar">
+        <div class="pub-navbar-inner">
+            <a class="pub-logo" href="/">
+                <span class="pub-logo-icon">🎟</span>
+                <span class="pub-logo-text">TicketPrime</span>
+            </a>
+
+            <nav class="pub-nav" aria-label="Navegação principal">
+                <a class="pub-nav-link @(IsActive("/") ? "active" : "")" href="/">Início</a>
+                <a class="pub-nav-link @(IsActive("/explorar") ? "active" : "")" href="/explorar">Eventos</a>
+            </nav>
+
+            <div class="pub-nav-actions">
+                <a class="pub-btn-ghost" href="/entrar">Entrar</a>
+                <a class="pub-btn-primary" href="/registrar">Criar conta</a>
+            </div>
+
+            <!-- Mobile hamburger -->
+            <button class="pub-hamburger @(_mobileOpen ? "open" : "")"
+                    @onclick="ToggleMobile"
+                    aria-label="Abrir menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+
+        <!-- Mobile drawer -->
+        @if (_mobileOpen)
+        {
+            <div class="pub-mobile-menu">
+                <a class="pub-mobile-link" href="/" @onclick="CloseMobile">Início</a>
+                <a class="pub-mobile-link" href="/explorar" @onclick="CloseMobile">Eventos</a>
+                <div class="pub-mobile-actions">
+                    <a class="pub-btn-ghost" href="/entrar" @onclick="CloseMobile">Entrar</a>
+                    <a class="pub-btn-primary" href="/registrar" @onclick="CloseMobile">Criar conta</a>
+                </div>
+            </div>
+        }
+    </header>
+
+    <!-- Page content -->
+    <main class="pub-main">
+        @Body
+    </main>
+
+    <!-- Footer -->
+    <footer class="pub-footer">
+        <div class="pub-footer-inner">
+            <div class="pub-footer-brand">
+                <span class="pub-footer-logo">🎟 TicketPrime</span>
+                <p>A plataforma de ingressos para experiências inesquecíveis.</p>
+            </div>
+
+            <nav class="pub-footer-links" aria-label="Links do rodapé">
+                <div class="pub-footer-col">
+                    <span class="pub-footer-col-title">Plataforma</span>
+                    <a href="/">Início</a>
+                    <a href="/explorar">Explorar eventos</a>
+                    <a href="/registrar">Criar conta</a>
+                </div>
+                <div class="pub-footer-col">
+                    <span class="pub-footer-col-title">Conta</span>
+                    <a href="/entrar">Entrar</a>
+                    <a href="/registrar">Registrar</a>
+                </div>
+                <div class="pub-footer-col">
+                    <span class="pub-footer-col-title">Operadores</span>
+                    <a href="/eventos">Painel Admin</a>
+                </div>
+            </nav>
+        </div>
+
+        <div class="pub-footer-bottom">
+            <span>© 2026 TicketPrime. Todos os direitos reservados.</span>
+        </div>
+    </footer>
+</div>
+
+@code {
+    private bool _mobileOpen;
+
+    private readonly MudTheme _theme = new()
+    {
+        PaletteLight = new PaletteLight
+        {
+            Primary = "#0f766e",
+            AppbarBackground = "#0f766e",
+        },
+        PaletteDark = new PaletteDark
+        {
+            Primary = "#14b8a6"
+        }
+    };
+
+    private bool IsActive(string href)
+    {
+        if (href == "/")
+            return Navigation.Uri == Navigation.BaseUri || Navigation.Uri.TrimEnd('/') == Navigation.BaseUri.TrimEnd('/');
+        return Navigation.Uri.Contains(href, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void ToggleMobile() => _mobileOpen = !_mobileOpen;
+    private void CloseMobile() => _mobileOpen = false;
+}

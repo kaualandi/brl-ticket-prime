@@ -1,150 +1,217 @@
 .event-card {
-    position: relative;
-    display: grid;
-    gap: 22px;
-    overflow: hidden;
-    padding: 24px;
-    border: 1px solid rgba(106, 125, 154, 0.16);
-    border-radius: 28px;
-    background: rgba(255, 255, 255, 0.82);
-    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
-    backdrop-filter: blur(18px);
-    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(106, 125, 154, 0.16);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(18px);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
 }
 
 .event-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 24px 54px rgba(15, 23, 42, 0.12);
-    border-color: rgba(15, 118, 110, 0.24);
+  transform: translateY(-4px);
+  box-shadow: 0 24px 54px rgba(15, 23, 42, 0.12);
+  border-color: rgba(15, 118, 110, 0.24);
+}
+
+/* ── image header ── */
+.event-card-image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.event-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 300ms ease;
+}
+
+.event-card:hover .event-card-image img {
+  transform: scale(1.04);
+}
+
+.event-card-image-placeholder {
+  background: linear-gradient(135deg, #0f766e 0%, #0e7490 60%, #1e40af 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16 / 9;
+}
+
+.image-placeholder-eyebrow {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ── content ── */
+.event-card-content {
+  display: grid;
+  gap: 22px;
+  padding: 24px;
+  flex: 1;
 }
 
 .event-card-featured {
-    background:
-        linear-gradient(180deg, rgba(236, 253, 245, 0.84), rgba(255, 255, 255, 0.9)),
-        rgba(255, 255, 255, 0.82);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(236, 253, 245, 0.84),
+      rgba(255, 255, 255, 0.9)
+    ),
+    rgba(255, 255, 255, 0.82);
 }
 
-.event-card-hero {
-    align-content: start;
-    gap: 18px;
-    padding: 32px;
-    background:
-        linear-gradient(160deg, rgba(255, 255, 255, 0.96), rgba(241, 245, 249, 0.92)),
-        rgba(255, 255, 255, 0.82);
+.event-card-hero .event-card-content {
+  align-content: start;
+  gap: 18px;
+  padding: 32px;
 }
 
-.event-card-hero::after {
-    content: "";
-    position: absolute;
-    inset: auto -3rem -3rem auto;
-    width: 12rem;
-    height: 12rem;
-    border-radius: 999px;
-    background: linear-gradient(135deg, rgba(15, 118, 110, 0.16), rgba(14, 165, 233, 0.04));
-    filter: blur(2px);
+.event-card-hero:not(.event-card-has-image) {
+  background:
+    linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.96),
+      rgba(241, 245, 249, 0.92)
+    ),
+    rgba(255, 255, 255, 0.82);
+}
+
+.event-card-hero:not(.event-card-has-image)::after {
+  content: "";
+  position: absolute;
+  inset: auto -3rem -3rem auto;
+  width: 12rem;
+  height: 12rem;
+  border-radius: 999px;
+  background: linear-gradient(
+    135deg,
+    rgba(15, 118, 110, 0.16),
+    rgba(14, 165, 233, 0.04)
+  );
+  filter: blur(2px);
 }
 
 .event-card-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .event-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    width: fit-content;
-    padding: 8px 14px;
-    border-radius: 999px;
-    color: #115e59;
-    background: rgba(20, 184, 166, 0.12);
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  padding: 8px 14px;
+  border-radius: 999px;
+  color: #115e59;
+  background: rgba(20, 184, 166, 0.12);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .event-date,
 .footer-label {
-    color: #64748b;
-    font-size: 0.9rem;
+  color: #64748b;
+  font-size: 0.9rem;
 }
 
 .event-card-body {
-    display: grid;
-    gap: 12px;
+  display: grid;
+  gap: 12px;
 }
 
 .event-card-body h3 {
-    margin: 0;
-    color: #0f172a;
-    font-size: 1.55rem;
-    line-height: 1.1;
-    letter-spacing: -0.04em;
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.55rem;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
 }
 
 .event-card-hero .event-card-body h3 {
-    font-size: 2rem;
-    line-height: 1.05;
+  font-size: 2rem;
+  line-height: 1.05;
 }
 
 .event-card-body p {
-    margin: 0;
-    color: #475569;
-    font-size: 1rem;
-    line-height: 1.7;
+  margin: 0;
+  color: #475569;
+  font-size: 1rem;
+  line-height: 1.7;
 }
 
 .event-card-meta,
 .event-card-footer {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
 }
 
 .event-card-meta {
-    padding: 16px 18px;
-    border-radius: 18px;
-    background: rgba(248, 250, 252, 0.9);
-    border: 1px solid rgba(148, 163, 184, 0.16);
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(248, 250, 252, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.16);
 }
 
 .event-card-footer {
-    padding-top: 18px;
-    border-top: 1px solid rgba(148, 163, 184, 0.18);
+  padding-top: 18px;
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.event-card-actions-slot {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
 }
 
 .meta-item,
 .footer-item {
-    display: grid;
-    gap: 6px;
+  display: grid;
+  gap: 6px;
 }
 
 .meta-item strong,
 .footer-item strong {
-    color: #0f172a;
-    font-size: 1rem;
+  color: #0f172a;
+  font-size: 1rem;
 }
 
 @media (max-width: 720px) {
-    .event-card,
-    .event-card-hero {
-        padding: 22px;
-        border-radius: 22px;
-    }
+  .event-card,
+  .event-card-hero {
+    padding: 22px;
+    border-radius: 22px;
+  }
 
-    .event-card-top {
-        align-items: flex-start;
-        flex-direction: column;
-    }
+  .event-card-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 
-    .event-card-footer {
-        grid-template-columns: 1fr;
-    }
+  .event-card-footer {
+    grid-template-columns: 1fr;
+  }
 
-    .event-card-meta {
-        grid-template-columns: 1fr;
-    }
+  .event-card-meta {
+    grid-template-columns: 1fr;
+  }
 }

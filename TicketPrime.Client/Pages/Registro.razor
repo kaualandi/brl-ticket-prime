@@ -1,0 +1,162 @@
+@page "/registrar"
+@layout PublicLayout
+@using TicketPrime.Client.Services.Usuarios
+@inject IUsuarioService UsuarioService
+@inject NavigationManager Navigation
+@inject MudBlazor.ISnackbar Snackbar
+
+<PageTitle>Criar conta — TicketPrime</PageTitle>
+
+<div class="registro-page">
+    <div class="registro-card">
+        <div class="registro-header">
+            <span class="registro-icon">🎟</span>
+            <h1>Criar conta</h1>
+            <p>Junte-se ao TicketPrime e garanta seu ingresso</p>
+        </div>
+
+        <div class="registro-form">
+            <div class="registro-field">
+                <label for="nome">Nome completo</label>
+                <input id="nome" class="registro-input" type="text"
+                       placeholder="Maria da Silva" disabled="@isSubmitting"
+                       @bind="form.Nome" @bind:event="oninput" />
+                @if (submitted && string.IsNullOrWhiteSpace(form.Nome))
+                {
+                    <span class="registro-field-error">Nome é obrigatório</span>
+                }
+            </div>
+
+            <div class="registro-field">
+                <label for="email">E-mail</label>
+                <input id="email" class="registro-input" type="email"
+                       placeholder="maria@email.com" disabled="@isSubmitting"
+                       @bind="form.Email" @bind:event="oninput" />
+                @if (submitted && string.IsNullOrWhiteSpace(form.Email))
+                {
+                    <span class="registro-field-error">E-mail é obrigatório</span>
+                }
+            </div>
+
+            <div class="registro-field">
+                <label for="cpf">CPF</label>
+                <input id="cpf" class="registro-input" type="text"
+                       placeholder="000.000.000-00" disabled="@isSubmitting"
+                       @bind="form.Cpf" @bind:event="oninput" />
+                @if (submitted && string.IsNullOrWhiteSpace(form.Cpf))
+                {
+                    <span class="registro-field-error">CPF é obrigatório</span>
+                }
+            </div>
+
+            <div class="registro-field">
+                <label for="senha">Senha</label>
+                <input id="senha" class="registro-input" type="password"
+                       placeholder="Mínimo 6 caracteres" disabled="@isSubmitting"
+                       @bind="form.Senha" @bind:event="oninput" />
+                @if (submitted && form.Senha.Length < 6)
+                {
+                    <span class="registro-field-error">Senha deve ter ao menos 6 caracteres</span>
+                }
+            </div>
+
+            <div class="registro-field">
+                <label for="confirmar-senha">Confirmar senha</label>
+                <input id="confirmar-senha" class="registro-input" type="password"
+                       placeholder="Repita a senha" disabled="@isSubmitting"
+                       @bind="form.ConfirmarSenha" @bind:event="oninput" />
+                @if (!string.IsNullOrEmpty(senhaError))
+                {
+                    <span class="registro-field-error">@senhaError</span>
+                }
+            </div>
+
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="registro-alert-error">@errorMessage</div>
+            }
+
+            <button class="registro-btn-submit" disabled="@isSubmitting" @onclick="HandleSubmit">
+                @if (isSubmitting)
+                {
+                    <MudProgressCircular Class="registro-spinner" Indeterminate="true" Size="MudBlazor.Size.Small" />
+                    <span>Criando conta…</span>
+                }
+                else
+                {
+                    <span>Criar conta</span>
+                }
+            </button>
+        </div>
+
+        <p class="registro-footer-text">
+            Já tem uma conta?
+            <a href="/entrar" class="registro-link">Entrar</a>
+        </p>
+    </div>
+</div>
+
+@code {
+    private RegistroFormModel form = new();
+    private bool isSubmitting;
+    private bool submitted;
+    private string errorMessage = string.Empty;
+    private string senhaError = string.Empty;
+
+    private async Task HandleSubmit()
+    {
+        submitted = true;
+        senhaError = string.Empty;
+        errorMessage = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(form.Nome) ||
+            string.IsNullOrWhiteSpace(form.Email) ||
+            string.IsNullOrWhiteSpace(form.Cpf) ||
+            form.Senha.Length < 6)
+            return;
+
+        if (form.Senha != form.ConfirmarSenha)
+        {
+            senhaError = "As senhas não coincidem.";
+            return;
+        }
+
+        isSubmitting = true;
+        try
+        {
+            var request = new SalvarUsuarioRequest
+            {
+                Nome = form.Nome.Trim(),
+                Email = form.Email.Trim(),
+                Cpf = form.Cpf.Trim(),
+                Senha = form.Senha
+            };
+
+            var result = await UsuarioService.CriarAsync(request);
+            if (result.Success)
+            {
+                Snackbar.Add("Conta criada com sucesso! Faça login para continuar.", MudBlazor.Severity.Success);
+                Navigation.NavigateTo("/entrar");
+            }
+            else
+            {
+                errorMessage = result.ErrorMessage ?? "Não foi possível criar a conta. Tente novamente.";
+            }
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private sealed class RegistroFormModel
+    {
+        public string Nome { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Cpf { get; set; } = string.Empty;
+        public string Senha { get; set; } = string.Empty;
+
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Confirme a senha")]
+        public string ConfirmarSenha { get; set; } = string.Empty;
+    }
+}

@@ -51,10 +51,6 @@
   text-align: center;
 }
 
-.registro-icon {
-  font-size: 2.8rem;
-}
-
 .registro-header h1 {
   margin: 0;
   color: var(--text-strong);

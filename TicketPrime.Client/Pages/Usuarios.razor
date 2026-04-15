@@ -57,7 +57,7 @@
                     <RowTemplate>
                         <MudTd DataLabel="Nome">@context.Nome</MudTd>
                         <MudTd DataLabel="Email">@context.Email</MudTd>
-                        <MudTd DataLabel="CPF">@context.Cpf</MudTd>
+                        <MudTd DataLabel="CPF">@FormatCpf(context.Cpf)</MudTd>
                         <MudTd DataLabel="Ações">
                             <MudButton Variant="Variant.Text"
                                        Color="Color.Primary"
@@ -112,6 +112,22 @@
         public string Cpf { get; set; } = string.Empty;
         public string Nome { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
+    }
+
+    private static string FormatCpf(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return string.Empty;
+
+        var digits = new string(value.Where(char.IsDigit).Take(11).ToArray());
+
+        return digits.Length switch
+        {
+            <= 3 => digits,
+            <= 6 => $"{digits[..3]}.{digits[3..]}",
+            <= 9 => $"{digits[..3]}.{digits[3..6]}.{digits[6..]}",
+            _ => $"{digits[..3]}.{digits[3..6]}.{digits[6..9]}-{digits[9..]}"
+        };
     }
 
     private async Task DeleteUsuario(string cpf)

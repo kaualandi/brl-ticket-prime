@@ -66,6 +66,7 @@
                                       Margin="Margin.Dense"
                                       FullWidth="true"
                                       Placeholder="000.000.000-00"
+                                      Mask="@(new PatternMask("000.000.000-00"))"
                                       For="@(() => _form.Cpf)"
                                       @bind-Value="_form.Cpf" />
                     </div>
@@ -104,13 +105,13 @@
     {
         try
         {
-            var usuario = await Http.GetFromJsonAsync<UsuarioData>($"api/usuarios/{Cpf}");
+            var usuario = await Http.GetFromJsonAsync<UsuarioData>($"api/usuarios/{GetCpfDigits(Cpf)}");
             if (usuario is not null)
             {
                 _form.Nome = usuario.Nome;
                 _form.Email = usuario.Email;
                 _form.Senha = usuario.Senha;
-                _form.Cpf = usuario.Cpf;
+                _form.Cpf = FormatCpf(usuario.Cpf);
             }
             else
             {
@@ -139,10 +140,10 @@
                 Nome = _form.Nome!.Trim(),
                 Email = _form.Email!.Trim(),
                 Senha = _form.Senha,
-                Cpf = _form.Cpf!.Trim()
+                Cpf = GetCpfDigits(_form.Cpf)
             };
 
-            var response = await Http.PutAsJsonAsync($"api/usuarios/{Cpf}", payload);
+            var response = await Http.PutAsJsonAsync($"api/usuarios/{GetCpfDigits(Cpf)}", payload);
 
             if (response.IsSuccessStatusCode)
             {
@@ -190,5 +191,26 @@
 
         [Required(ErrorMessage = "CPF é obrigatório.")]
         public string? Cpf { get; set; }
+    }
+
+    private static string GetCpfDigits(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return string.Empty;
+
+        return new string(value.Where(char.IsDigit).Take(11).ToArray());
+    }
+
+    private static string FormatCpf(string? value)
+    {
+        var digits = GetCpfDigits(value);
+
+        return digits.Length switch
+        {
+            <= 3 => digits,
+            <= 6 => $"{digits[..3]}.{digits[3..]}",
+            <= 9 => $"{digits[..3]}.{digits[3..6]}.{digits[6..]}",
+            _ => $"{digits[..3]}.{digits[3..6]}.{digits[6..9]}-{digits[9..]}"
+        };
     }
 }

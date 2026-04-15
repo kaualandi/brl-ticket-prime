@@ -33,10 +33,6 @@
   text-align: center;
 }
 
-.detail-nf-icon {
-  font-size: 3.5rem;
-}
-
 .detail-not-found h1 {
   margin: 0;
   color: var(--text-strong);

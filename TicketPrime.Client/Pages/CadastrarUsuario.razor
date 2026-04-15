@@ -100,7 +100,7 @@
                 Nome = _form.Nome!.Trim(),
                 Email = _form.Email!.Trim(),
                 Senha = _form.Senha,
-                Cpf = _form.Cpf!.Trim()
+                Cpf = GetCpfDigits(_form.Cpf)
             };
 
             var response = await Http.PostAsJsonAsync("api/usuarios", payload);
@@ -143,5 +143,13 @@
 
         [Required(ErrorMessage = "CPF é obrigatório.")]
         public string? Cpf { get; set; }
+    }
+
+    private static string GetCpfDigits(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return string.Empty;
+
+        return new string(value.Where(char.IsDigit).Take(11).ToArray());
     }
 }

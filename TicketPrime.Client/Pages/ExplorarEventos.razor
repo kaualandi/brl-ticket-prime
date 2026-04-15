@@ -53,7 +53,7 @@
 
                 @if (localOptions.Count > 1)
                 {
-                    <span class="explorar-filter-label explorar-filter-label--gap">Local:</span>
+                    <span class="explorar-filter-label">Local:</span>
                     <div class="explorar-chip-group">
                         <button class="explorar-chip @(string.IsNullOrEmpty(localFilter) ? "explorar-chip--active" : "")"
                                 @onclick='() => localFilter = string.Empty'>

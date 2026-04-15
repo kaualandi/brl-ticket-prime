@@ -8,8 +8,12 @@ public static class ServiceExtensions
     public static IServiceCollection AddDatabase(
         this IServiceCollection services, IConfiguration config)
     {
+        var connectionString = config.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException(
+                "Connection string 'DefaultConnection' was not found. Configure it in appsettings.Development.json, appsettings.json, or environment variables.");
+
         services.AddScoped<IDbConnection>(_ =>
-            new SqlConnection(config.GetConnectionString("DefaultConnection")));
+            new SqlConnection(connectionString));
 
         return services;
     }

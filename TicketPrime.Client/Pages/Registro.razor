@@ -42,10 +42,17 @@
                 <label for="cpf">CPF</label>
                 <input id="cpf" class="registro-input" type="text"
                        placeholder="000.000.000-00" disabled="@isSubmitting"
-                       @bind="form.Cpf" @bind:event="oninput" />
+                       value="@form.Cpf"
+                       inputmode="numeric"
+                       maxlength="14"
+                       @oninput="HandleCpfInput" />
                 @if (submitted && string.IsNullOrWhiteSpace(form.Cpf))
                 {
                     <span class="registro-field-error">CPF é obrigatório</span>
+                }
+                else if (submitted && GetCpfDigits(form.Cpf).Length != 11)
+                {
+                    <span class="registro-field-error">CPF deve ter 11 dígitos</span>
                 }
             </div>
 
@@ -115,6 +122,9 @@
             form.Senha.Length < 6)
             return;
 
+        if (GetCpfDigits(form.Cpf).Length != 11)
+            return;
+
         if (form.Senha != form.ConfirmarSenha)
         {
             senhaError = "As senhas não coincidem.";
@@ -128,7 +138,7 @@
             {
                 Nome = form.Nome.Trim(),
                 Email = form.Email.Trim(),
-                Cpf = form.Cpf.Trim(),
+                Cpf = GetCpfDigits(form.Cpf),
                 Senha = form.Senha
             };
 
@@ -147,6 +157,32 @@
         {
             isSubmitting = false;
         }
+    }
+
+    private void HandleCpfInput(ChangeEventArgs args)
+    {
+        form.Cpf = FormatCpf(args.Value?.ToString());
+    }
+
+    private static string GetCpfDigits(string? value)
+    {
+        if (string.IsNullOrEmpty(value))
+            return string.Empty;
+
+        return new string(value.Where(char.IsDigit).Take(11).ToArray());
+    }
+
+    private static string FormatCpf(string? value)
+    {
+        var digits = GetCpfDigits(value);
+
+        return digits.Length switch
+        {
+            <= 3 => digits,
+            <= 6 => $"{digits[..3]}.{digits[3..]}",
+            <= 9 => $"{digits[..3]}.{digits[3..6]}.{digits[6..]}",
+            _ => $"{digits[..3]}.{digits[3..6]}.{digits[6..9]}-{digits[9..]}"
+        };
     }
 
     private sealed class RegistroFormModel

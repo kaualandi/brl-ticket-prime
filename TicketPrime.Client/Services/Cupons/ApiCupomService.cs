@@ -20,7 +20,7 @@ public sealed class ApiCupomService(HttpClient http) : ICupomService
             return CriarCupomResult.Fail(await ExtractErrorMessageAsync(response, cancellationToken));
         }
 
-        return CriarCupomResult.Fail("Nao foi possivel cadastrar o cupom agora. Tente novamente em instantes.");
+        return CriarCupomResult.Fail("Não foi possível cadastrar o cupom agora. Tente novamente em instantes.");
     }
 
     public async Task<IReadOnlyList<CupomListItem>> ListarAsync(CancellationToken cancellationToken = default)
@@ -69,10 +69,10 @@ public sealed class ApiCupomService(HttpClient http) : ICupomService
 
         if (response.StatusCode == HttpStatusCode.NotFound)
         {
-            return CriarCupomResult.Fail("Cupom nao encontrado para edicao.");
+            return CriarCupomResult.Fail("Cupom não encontrado para edição.");
         }
 
-        return CriarCupomResult.Fail("Nao foi possivel atualizar o cupom agora. Tente novamente em instantes.");
+        return CriarCupomResult.Fail("Não foi possível atualizar o cupom agora. Tente novamente em instantes.");
     }
 
     public async Task<CriarCupomResult> DeletarAsync(string codigo, CancellationToken cancellationToken = default)
@@ -83,9 +83,9 @@ public sealed class ApiCupomService(HttpClient http) : ICupomService
             return CriarCupomResult.Ok();
 
         if (response.StatusCode == HttpStatusCode.NotFound)
-            return CriarCupomResult.Fail("Cupom nao encontrado.");
+            return CriarCupomResult.Fail("Cupom não encontrado.");
 
-        return CriarCupomResult.Fail("Nao foi possivel excluir o cupom agora. Tente novamente em instantes.");
+        return CriarCupomResult.Fail("Não foi possível excluir o cupom agora. Tente novamente em instantes.");
     }
 
     private static async Task<string> ExtractErrorMessageAsync(HttpResponseMessage response, CancellationToken cancellationToken)
@@ -94,7 +94,7 @@ public sealed class ApiCupomService(HttpClient http) : ICupomService
 
         if (string.IsNullOrWhiteSpace(rawContent))
         {
-            return "A API retornou um erro de validacao sem detalhes.";
+            return "A API retornou um erro de validação sem detalhes.";
         }
 
         try

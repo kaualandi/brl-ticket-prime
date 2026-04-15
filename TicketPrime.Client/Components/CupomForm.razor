@@ -10,7 +10,7 @@
 <section class="coupon-form-page">
     <div class="coupon-form-shell">
         <div class="coupon-form-header">
-            <span class="coupon-form-eyebrow">Operacao de cupons</span>
+            <span class="coupon-form-eyebrow">Operação de cupons</span>
             <h1>@HeaderTitle</h1>
             <p>@HeaderDescription</p>
         </div>
@@ -36,7 +36,7 @@
 
                     <div class="form-grid">
                         <MudTextField T="string"
-                                      Label="Codigo"
+                                      Label="Código"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
                                       FullWidth="true"
@@ -59,7 +59,7 @@
                                          @bind-Value="form.PorcentagemDesconto" />
 
                         <MudNumericField T="decimal?"
-                                         Label="Valor minimo da regra"
+                                         Label="Valor mínimo da regra"
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
                                          Min="0"
@@ -108,8 +108,8 @@
     private string PageTitleText => IsEditMode ? "Editar Cupom" : "Cadastrar Cupom";
     private string HeaderTitle => IsEditMode ? "Editar cupom" : "Cadastrar novo cupom";
     private string HeaderDescription => IsEditMode
-        ? "Ajuste codigo, percentual de desconto e regra minima em uma experiencia direta para o operador."
-        : "Crie descontos de forma rapida sem depender de chamadas manuais via Postman.";
+        ? "Ajuste código, percentual de desconto e regra mínima em uma experiência direta para o operador."
+        : "Crie descontos de forma rápida sem depender de chamadas manuais via Postman.";
     private string SubmitButtonText => isSubmitting
         ? (IsEditMode ? "Salvando..." : "Cadastrando...")
         : (IsEditMode ? "Salvar" : "Cadastrar");
@@ -134,7 +134,7 @@
         if (string.IsNullOrWhiteSpace(Codigo))
         {
             form = new CupomFormModel();
-            errorMessage = "Cupom invalido para edicao.";
+            errorMessage = "Cupom inválido para edição.";
             isLoading = false;
             return;
         }
@@ -148,7 +148,7 @@
             if (cupom is null)
             {
                 form = new CupomFormModel();
-                errorMessage = "Cupom nao encontrado.";
+                errorMessage = "Cupom não encontrado.";
                 return;
             }
 
@@ -162,7 +162,7 @@
         catch
         {
             form = new CupomFormModel();
-            errorMessage = "Nao foi possivel carregar o cupom para edicao.";
+            errorMessage = "Não foi possível carregar o cupom para edição.";
         }
         finally
         {
@@ -181,7 +181,7 @@
             {
                 if (string.IsNullOrWhiteSpace(Codigo))
                 {
-                    errorMessage = "Cupom invalido para edicao.";
+                    errorMessage = "Cupom inválido para edição.";
                     return;
                 }
 
@@ -244,15 +244,15 @@
 
     private sealed class CupomFormModel
     {
-        [Required(ErrorMessage = "Informe o codigo do cupom.")]
+        [Required(ErrorMessage = "Informe o código do cupom.")]
         public string Codigo { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Informe a porcentagem de desconto.")]
         [Range(typeof(decimal), "1", "100", ErrorMessage = "A porcentagem de desconto deve estar entre 1 e 100.")]
         public decimal? PorcentagemDesconto { get; set; }
 
-        [Required(ErrorMessage = "Informe o valor minimo da regra.")]
-        [Range(typeof(decimal), "0", "999999999", ErrorMessage = "O valor minimo da regra nao pode ser negativo.")]
+        [Required(ErrorMessage = "Informe o valor mínimo da regra.")]
+        [Range(typeof(decimal), "0", "999999999", ErrorMessage = "O valor mínimo da regra não pode ser negativo.")]
         public decimal? ValorMinimoRegra { get; set; }
 
         public void Reset()

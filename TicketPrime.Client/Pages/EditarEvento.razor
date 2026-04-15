@@ -195,7 +195,7 @@
                 return;
             }
 
-            errorMessage = result.ErrorMessage ?? "Nao foi possivel atualizar o evento agora.";
+            errorMessage = result.ErrorMessage ?? "Não foi possível atualizar o evento agora.";
         }
         catch
         {
@@ -220,7 +220,7 @@
         [Required(ErrorMessage = "Informe o local do evento.")]
         public string LocalEvento { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Informe a descricao do evento.")]
+        [Required(ErrorMessage = "Informe a descrição do evento.")]
         public string Descricao { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Informe a capacidade total.")]
@@ -230,8 +230,8 @@
         [Required(ErrorMessage = "Informe a data do evento.")]
         public DateTime? DataEvento { get; set; }
 
-        [Required(ErrorMessage = "Informe o preco padrao.")]
-        [Range(0.01, 999999999, ErrorMessage = "O preco padrao deve ser maior que zero.")]
+        [Required(ErrorMessage = "Informe o preço padrão.")]
+        [Range(0.01, 999999999, ErrorMessage = "O preço padrão deve ser maior que zero.")]
         public decimal? PrecoPadrao { get; set; }
 
         public string ImageUrl { get; set; } = string.Empty;

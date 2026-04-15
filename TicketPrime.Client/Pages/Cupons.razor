@@ -11,9 +11,9 @@
     <div class="coupons-shell">
         <div class="coupons-header">
             <div>
-                <span class="coupons-eyebrow">Operacao de cupons</span>
+                <span class="coupons-eyebrow">Operação de cupons</span>
                 <h1>Cupons cadastrados</h1>
-                <p>Consulte os cupons ativos, filtre por codigo e acesse a edicao quando precisar ajustar regras.</p>
+                <p>Consulte os cupons ativos, filtre por código e acesse a edição quando precisar ajustar regras.</p>
             </div>
 
             <MudButton Variant="Variant.Filled"
@@ -33,7 +33,7 @@
             }
 
             <MudTextField T="string"
-                          Label="Buscar por codigo"
+                          Label="Buscar por código"
                           Variant="Variant.Outlined"
                           Margin="Margin.Dense"
                           FullWidth="true"
@@ -63,10 +63,10 @@
                         <MudTh>Ações</MudTh>
                     </HeaderContent>
                     <RowTemplate>
-                        <MudTd DataLabel="Codigo">@context.Codigo</MudTd>
+                        <MudTd DataLabel="Código">@context.Codigo</MudTd>
                         <MudTd DataLabel="Desconto">@context.PorcentagemDesconto.ToString("N0")%</MudTd>
-                        <MudTd DataLabel="Valor minimo">@context.ValorMinimoRegra</MudTd>
-                        <MudTd DataLabel="Acoes">
+                        <MudTd DataLabel="Valor mínimo">@context.ValorMinimoRegra</MudTd>
+                        <MudTd DataLabel="Ações">
                             <MudIconButton Class="action-icon-button"
                                            Icon="@Icons.Material.Filled.Edit"
                                            Color="Color.Primary"
@@ -118,7 +118,7 @@
         }
         catch
         {
-            errorMessage = "Nao foi possivel carregar os cupons agora.";
+            errorMessage = "Não foi possível carregar os cupons agora.";
         }
         finally
         {

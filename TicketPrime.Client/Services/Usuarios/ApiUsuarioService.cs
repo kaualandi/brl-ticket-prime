@@ -41,7 +41,7 @@ public sealed class ApiUsuarioService(HttpClient http) : IUsuarioService
         if (response.StatusCode == HttpStatusCode.BadRequest)
             return UsuarioResult.Fail(await response.Content.ReadAsStringAsync(cancellationToken));
 
-        return UsuarioResult.Fail("Nao foi possivel cadastrar o usuario agora. Tente novamente em instantes.");
+        return UsuarioResult.Fail("Não foi possível cadastrar o usuário agora. Tente novamente em instantes.");
     }
 
     public async Task<UsuarioResult> AtualizarAsync(string cpf, SalvarUsuarioRequest request, CancellationToken cancellationToken = default)
@@ -52,12 +52,12 @@ public sealed class ApiUsuarioService(HttpClient http) : IUsuarioService
             return UsuarioResult.Ok();
 
         if (response.StatusCode == HttpStatusCode.NotFound)
-            return UsuarioResult.Fail("Usuario nao encontrado.");
+            return UsuarioResult.Fail("Usuário não encontrado.");
 
         if (response.StatusCode == HttpStatusCode.BadRequest)
             return UsuarioResult.Fail(await response.Content.ReadAsStringAsync(cancellationToken));
 
-        return UsuarioResult.Fail("Nao foi possivel atualizar o usuario agora. Tente novamente em instantes.");
+        return UsuarioResult.Fail("Não foi possível atualizar o usuário agora. Tente novamente em instantes.");
     }
 
     public async Task<UsuarioResult> DeletarAsync(string cpf, CancellationToken cancellationToken = default)
@@ -68,8 +68,8 @@ public sealed class ApiUsuarioService(HttpClient http) : IUsuarioService
             return UsuarioResult.Ok();
 
         if (response.StatusCode == HttpStatusCode.NotFound)
-            return UsuarioResult.Fail("Usuario nao encontrado.");
+            return UsuarioResult.Fail("Usuário não encontrado.");
 
-        return UsuarioResult.Fail("Nao foi possivel excluir o usuario agora. Tente novamente em instantes.");
+        return UsuarioResult.Fail("Não foi possível excluir o usuário agora. Tente novamente em instantes.");
     }
 }

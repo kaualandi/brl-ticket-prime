@@ -41,7 +41,7 @@ public sealed class ApiEventoService(HttpClient http) : IEventoService
         if (response.StatusCode == HttpStatusCode.BadRequest)
             return EventoResult.Fail(await response.Content.ReadAsStringAsync(cancellationToken));
 
-        return EventoResult.Fail("Nao foi possivel criar o evento agora. Tente novamente em instantes.");
+        return EventoResult.Fail("Não foi possível criar o evento agora. Tente novamente em instantes.");
     }
 
     public async Task<EventoResult> AtualizarAsync(int id, SalvarEventoRequest request, CancellationToken cancellationToken = default)
@@ -52,12 +52,12 @@ public sealed class ApiEventoService(HttpClient http) : IEventoService
             return EventoResult.Ok();
 
         if (response.StatusCode == HttpStatusCode.NotFound)
-            return EventoResult.Fail("Evento nao encontrado.");
+            return EventoResult.Fail("Evento não encontrado.");
 
         if (response.StatusCode == HttpStatusCode.BadRequest)
             return EventoResult.Fail(await response.Content.ReadAsStringAsync(cancellationToken));
 
-        return EventoResult.Fail("Nao foi possivel atualizar o evento agora. Tente novamente em instantes.");
+        return EventoResult.Fail("Não foi possível atualizar o evento agora. Tente novamente em instantes.");
     }
 
     public async Task<EventoResult> DeletarAsync(int id, CancellationToken cancellationToken = default)
@@ -68,8 +68,8 @@ public sealed class ApiEventoService(HttpClient http) : IEventoService
             return EventoResult.Ok();
 
         if (response.StatusCode == HttpStatusCode.NotFound)
-            return EventoResult.Fail("Evento nao encontrado.");
+            return EventoResult.Fail("Evento não encontrado.");
 
-        return EventoResult.Fail("Nao foi possivel excluir o evento agora. Tente novamente em instantes.");
+        return EventoResult.Fail("Não foi possível excluir o evento agora. Tente novamente em instantes.");
     }
 }

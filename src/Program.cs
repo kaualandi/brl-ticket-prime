@@ -49,11 +49,11 @@ app.MapGet("/api/eventos/{id:int}", async (int id, IDbConnection db) =>
 app.MapPost("/api/eventos", async (CreateEventoRequest req, IDbConnection db) =>
 {
     if (string.IsNullOrWhiteSpace(req.Nome))        return Results.BadRequest("Nome é obrigatório.");
-    if (string.IsNullOrWhiteSpace(req.Descricao))   return Results.BadRequest("Descricao é obrigatória.");
+    if (string.IsNullOrWhiteSpace(req.Descricao))   return Results.BadRequest("Descrição é obrigatória.");
     if (string.IsNullOrWhiteSpace(req.LocalEvento)) return Results.BadRequest("LocalEvento é obrigatório.");
     if (req.CapacidadeTotal <= 0)                   return Results.BadRequest("CapacidadeTotal deve ser maior que zero.");
     if (req.DataEvento == default)                  return Results.BadRequest("DataEvento é obrigatória.");
-    if (req.PrecoPadrao <= 0)                       return Results.BadRequest("PrecoPadrao deve ser maior que zero.");
+    if (req.PrecoPadrao <= 0)                       return Results.BadRequest("Preço padrão deve ser maior que zero.");
 
     var id = await db.ExecuteScalarAsync<int>(
         """
@@ -78,11 +78,11 @@ app.MapPost("/api/eventos", async (CreateEventoRequest req, IDbConnection db) =>
 app.MapPut("/api/eventos/{id:int}", async (int id, CreateEventoRequest req, IDbConnection db) =>
 {
     if (string.IsNullOrWhiteSpace(req.Nome))        return Results.BadRequest("Nome é obrigatório.");
-    if (string.IsNullOrWhiteSpace(req.Descricao))   return Results.BadRequest("Descricao é obrigatória.");
+    if (string.IsNullOrWhiteSpace(req.Descricao))   return Results.BadRequest("Descrição é obrigatória.");
     if (string.IsNullOrWhiteSpace(req.LocalEvento)) return Results.BadRequest("LocalEvento é obrigatório.");
     if (req.CapacidadeTotal <= 0)                   return Results.BadRequest("CapacidadeTotal deve ser maior que zero.");
     if (req.DataEvento == default)                  return Results.BadRequest("DataEvento é obrigatória.");
-    if (req.PrecoPadrao <= 0)                       return Results.BadRequest("PrecoPadrao deve ser maior que zero.");
+    if (req.PrecoPadrao <= 0)                       return Results.BadRequest("Preço padrão deve ser maior que zero.");
 
     var rows = await db.ExecuteAsync(
         """
@@ -250,7 +250,7 @@ app.MapDelete("/api/usuarios/{cpf}", async (string cpf, IDbConnection db) =>
 static string? ValidarCupom(Cupom c)
 {
     if (string.IsNullOrWhiteSpace(c.Codigo))
-        return "Codigo é obrigatório.";
+        return "Código é obrigatório.";
     if (c.PorcentagemDesconto < 1 || c.PorcentagemDesconto > 100)
         return "PorcentagemDesconto deve ser um valor entre 1 e 100.";
     if (c.ValorMinimoRegra < 0)

@@ -14,10 +14,10 @@ public class EventoValidacaoTests
                                           int capacidadeTotal, decimal precoPadrao)
     {
         if (string.IsNullOrWhiteSpace(nome))        return "Nome é obrigatório.";
-        if (string.IsNullOrWhiteSpace(descricao))   return "Descricao é obrigatória.";
+        if (string.IsNullOrWhiteSpace(descricao))   return "Descrição é obrigatória.";
         if (string.IsNullOrWhiteSpace(localEvento)) return "LocalEvento é obrigatório.";
         if (capacidadeTotal <= 0)                   return "CapacidadeTotal deve ser maior que zero.";
-        if (precoPadrao <= 0)                       return "PrecoPadrao deve ser maior que zero.";
+        if (precoPadrao <= 0)                       return "Preço padrão deve ser maior que zero.";
         return null;
     }
 
@@ -32,7 +32,7 @@ public class EventoValidacaoTests
     public void DescricaoVazia_DeveRetornarErro()
     {
         var erro = ValidarEvento("Show", "", "Local", 100, 50m);
-        Assert.Equal("Descricao é obrigatória.", erro);
+        Assert.Equal("Descrição é obrigatória.", erro);
     }
 
     [Fact]
@@ -60,14 +60,14 @@ public class EventoValidacaoTests
     public void PrecoZero_DeveRetornarErro()
     {
         var erro = ValidarEvento("Show", "Descricao", "Local", 100, 0m);
-        Assert.Equal("PrecoPadrao deve ser maior que zero.", erro);
+        Assert.Equal("Preço padrão deve ser maior que zero.", erro);
     }
 
     [Fact]
     public void PrecoNegativo_DeveRetornarErro()
     {
         var erro = ValidarEvento("Show", "Descricao", "Local", 100, -1m);
-        Assert.Equal("PrecoPadrao deve ser maior que zero.", erro);
+        Assert.Equal("Preço padrão deve ser maior que zero.", erro);
     }
 
     [Fact]
@@ -82,7 +82,7 @@ public class CupomValidacaoTests
 {
     private static string? ValidarCupom(string codigo, decimal porcentagemDesconto, decimal valorMinimo)
     {
-        if (string.IsNullOrWhiteSpace(codigo))                                return "Codigo é obrigatório.";
+        if (string.IsNullOrWhiteSpace(codigo))                                return "Código é obrigatório.";
         if (porcentagemDesconto < 1 || porcentagemDesconto > 100)             return "PorcentagemDesconto deve ser um valor entre 1 e 100.";
         if (valorMinimo < 0)                                                  return "ValorMinimoRegra não pode ser negativo.";
         return null;
@@ -92,7 +92,7 @@ public class CupomValidacaoTests
     public void CodigoVazio_DeveRetornarErro()
     {
         var erro = ValidarCupom("", 10m, 0m);
-        Assert.Equal("Codigo é obrigatório.", erro);
+        Assert.Equal("Código é obrigatório.", erro);
     }
 
     [Fact]

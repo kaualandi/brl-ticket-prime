@@ -42,44 +42,12 @@ Para executar o projeto, é necessário ter instalado:
 docker compose up -d
 ```
 
-2. Crie o banco e as tabelas:
+2. Crie o banco e as tabelas (schema conforme spec do projeto):
 
 ```bash
 docker exec ticketprime-sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'TicketPrime@2026' -C -Q "CREATE DATABASE TicketPrime;"
 
-docker exec ticketprime-sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'TicketPrime@2026' -C -d TicketPrime -Q "
-CREATE TABLE cupons (
-    id INT IDENTITY(1,1) PRIMARY KEY,
-    codigo VARCHAR(50) NOT NULL UNIQUE,
-    percentual_desconto DECIMAL(5,2) NOT NULL,
-    valor_minimo_regra DECIMAL(10,2) NOT NULL DEFAULT 0
-);
-
-CREATE TABLE Eventos (
-    Id INT IDENTITY(1,1) PRIMARY KEY,
-    Nome VARCHAR(200) NOT NULL,
-    Descricao VARCHAR(1000) NOT NULL DEFAULT '',
-    CapacidadeTotal INT NOT NULL,
-    DataEvento DATETIME NOT NULL,
-    PrecoPadrao DECIMAL(10,2) NOT NULL,
-    LocalEvento VARCHAR(200) NOT NULL DEFAULT '',
-    ImageUrl VARCHAR(500) NOT NULL DEFAULT ''
-);
-
-CREATE TABLE Usuarios (
-    Id INT IDENTITY(1,1) PRIMARY KEY,
-    Nome VARCHAR(200) NOT NULL,
-    Email VARCHAR(200) NOT NULL UNIQUE,
-    Senha VARCHAR(200) NOT NULL,
-    Cpf VARCHAR(14) NOT NULL DEFAULT ''
-);
-"
-```
-
-3. Se o banco já existia sem a coluna `ImageUrl`, execute a migration:
-
-```bash
-docker exec ticketprime-sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'TicketPrime@2026' -C -d TicketPrime -Q "ALTER TABLE Eventos ADD ImageUrl VARCHAR(500) NOT NULL DEFAULT '';"
+docker exec -i ticketprime-sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'TicketPrime@2026' -C -d TicketPrime < db/ticketprime.sql
 ```
 
 ## Seed de dados
@@ -96,8 +64,11 @@ Em terminais separados:
 
 ```bash
 # API (http://localhost:5201)
-dotnet watch --project TicketPrime.Api --launch-profile http
+dotnet watch --project src --launch-profile http
 
 # Client Blazor (http://localhost:5272)
 dotnet watch --project TicketPrime.Client
+
+# Testes
+dotnet test tests
 ```

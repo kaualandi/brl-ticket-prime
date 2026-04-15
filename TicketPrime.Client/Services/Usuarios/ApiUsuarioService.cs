@@ -18,9 +18,9 @@ public sealed class ApiUsuarioService(HttpClient http) : IUsuarioService
         return [];
     }
 
-    public async Task<UsuarioListItem?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<UsuarioListItem?> ObterPorCpfAsync(string cpf, CancellationToken cancellationToken = default)
     {
-        var response = await http.GetAsync($"/api/usuarios/{id}", cancellationToken);
+        var response = await http.GetAsync($"/api/usuarios/{cpf}", cancellationToken);
 
         if (response.StatusCode == HttpStatusCode.NotFound)
             return null;
@@ -44,9 +44,9 @@ public sealed class ApiUsuarioService(HttpClient http) : IUsuarioService
         return UsuarioResult.Fail("Nao foi possivel cadastrar o usuario agora. Tente novamente em instantes.");
     }
 
-    public async Task<UsuarioResult> AtualizarAsync(int id, SalvarUsuarioRequest request, CancellationToken cancellationToken = default)
+    public async Task<UsuarioResult> AtualizarAsync(string cpf, SalvarUsuarioRequest request, CancellationToken cancellationToken = default)
     {
-        var response = await http.PutAsJsonAsync($"/api/usuarios/{id}", request, cancellationToken);
+        var response = await http.PutAsJsonAsync($"/api/usuarios/{cpf}", request, cancellationToken);
 
         if (response.StatusCode == HttpStatusCode.OK)
             return UsuarioResult.Ok();
@@ -60,9 +60,9 @@ public sealed class ApiUsuarioService(HttpClient http) : IUsuarioService
         return UsuarioResult.Fail("Nao foi possivel atualizar o usuario agora. Tente novamente em instantes.");
     }
 
-    public async Task<UsuarioResult> DeletarAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<UsuarioResult> DeletarAsync(string cpf, CancellationToken cancellationToken = default)
     {
-        var response = await http.DeleteAsync($"/api/usuarios/{id}", cancellationToken);
+        var response = await http.DeleteAsync($"/api/usuarios/{cpf}", cancellationToken);
 
         if (response.StatusCode == HttpStatusCode.NoContent)
             return UsuarioResult.Ok();

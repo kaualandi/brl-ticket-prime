@@ -4,8 +4,8 @@ public sealed class MockCupomService : ICupomService
 {
     private static readonly List<CupomListItem> Cupons =
     [
-        new CupomListItem { Id = 1, Codigo = "BEMVINDO10", PorcentagemDesconto = 10m, ValorMinimoRegra = 50m },
-        new CupomListItem { Id = 2, Codigo = "FESTA20", PorcentagemDesconto = 20m, ValorMinimoRegra = 120m }
+        new CupomListItem { Codigo = "BEMVINDO10", PorcentagemDesconto = 10m, ValorMinimoRegra = 50m },
+        new CupomListItem { Codigo = "FESTA20", PorcentagemDesconto = 20m, ValorMinimoRegra = 120m }
     ];
 
     public Task<CriarCupomResult> CriarAsync(CriarCupomRequest request, CancellationToken cancellationToken = default)
@@ -19,7 +19,6 @@ public sealed class MockCupomService : ICupomService
 
         Cupons.Add(new CupomListItem
         {
-            Id = Cupons.Count == 0 ? 1 : Cupons.Max(c => c.Id) + 1,
             Codigo = codigo,
             PorcentagemDesconto = request.PorcentagemDesconto,
             ValorMinimoRegra = request.ValorMinimoRegra
@@ -34,7 +33,6 @@ public sealed class MockCupomService : ICupomService
             .OrderBy(c => c.Codigo, StringComparer.OrdinalIgnoreCase)
             .Select(c => new CupomListItem
             {
-                Id = c.Id,
                 Codigo = c.Codigo,
                 PorcentagemDesconto = c.PorcentagemDesconto,
                 ValorMinimoRegra = c.ValorMinimoRegra
@@ -44,9 +42,9 @@ public sealed class MockCupomService : ICupomService
         return Task.FromResult<IReadOnlyList<CupomListItem>>(ordered);
     }
 
-    public Task<CupomListItem?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
+    public Task<CupomListItem?> ObterPorCodigoAsync(string codigo, CancellationToken cancellationToken = default)
     {
-        var found = Cupons.FirstOrDefault(c => c.Id == id);
+        var found = Cupons.FirstOrDefault(c => string.Equals(c.Codigo, codigo, StringComparison.OrdinalIgnoreCase));
 
         if (found is null)
         {
@@ -55,18 +53,17 @@ public sealed class MockCupomService : ICupomService
 
         return Task.FromResult<CupomListItem?>(new CupomListItem
         {
-            Id = found.Id,
             Codigo = found.Codigo,
             PorcentagemDesconto = found.PorcentagemDesconto,
             ValorMinimoRegra = found.ValorMinimoRegra
         });
     }
 
-    public Task<CriarCupomResult> AtualizarAsync(int id, AtualizarCupomRequest request, CancellationToken cancellationToken = default)
+    public Task<CriarCupomResult> AtualizarAsync(string codigo, AtualizarCupomRequest request, CancellationToken cancellationToken = default)
     {
         var codigoNovo = request.Codigo.Trim();
 
-        var cupomExistente = Cupons.FirstOrDefault(c => c.Id == id);
+        var cupomExistente = Cupons.FirstOrDefault(c => string.Equals(c.Codigo, codigo, StringComparison.OrdinalIgnoreCase));
 
         if (cupomExistente is null)
         {
@@ -74,7 +71,7 @@ public sealed class MockCupomService : ICupomService
         }
 
         var codigoDuplicado = Cupons.Any(c =>
-            c.Id != id &&
+            !string.Equals(c.Codigo, codigo, StringComparison.OrdinalIgnoreCase) &&
             string.Equals(c.Codigo, codigoNovo, StringComparison.OrdinalIgnoreCase));
 
         if (codigoDuplicado)
@@ -89,9 +86,9 @@ public sealed class MockCupomService : ICupomService
         return Task.FromResult(CriarCupomResult.Ok());
     }
 
-    public Task<CriarCupomResult> DeletarAsync(int id, CancellationToken cancellationToken = default)
+    public Task<CriarCupomResult> DeletarAsync(string codigo, CancellationToken cancellationToken = default)
     {
-        var removed = Cupons.RemoveAll(c => c.Id == id);
+        var removed = Cupons.RemoveAll(c => string.Equals(c.Codigo, codigo, StringComparison.OrdinalIgnoreCase));
 
         return removed > 0
             ? Task.FromResult(CriarCupomResult.Ok())

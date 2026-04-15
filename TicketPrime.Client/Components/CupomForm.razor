@@ -98,13 +98,13 @@
     private CupomFormModel form = new();
 
     [Parameter]
-    public int? Id { get; set; }
+    public string? Codigo { get; set; }
 
     private bool isSubmitting;
     private bool isLoading;
     private string? errorMessage;
 
-    private bool IsEditMode => Id.HasValue;
+    private bool IsEditMode => !string.IsNullOrWhiteSpace(Codigo);
     private string PageTitleText => IsEditMode ? "Editar Cupom" : "Cadastrar Cupom";
     private string HeaderTitle => IsEditMode ? "Editar cupom" : "Cadastrar novo cupom";
     private string HeaderDescription => IsEditMode
@@ -131,7 +131,7 @@
             return;
         }
 
-        if (Id <= 0)
+        if (string.IsNullOrWhiteSpace(Codigo))
         {
             form = new CupomFormModel();
             errorMessage = "Cupom invalido para edicao.";
@@ -139,11 +139,11 @@
             return;
         }
 
-        var editId = Id.GetValueOrDefault();
+        var editCodigo = Codigo;
 
         try
         {
-            CupomListItem? cupom = await CupomService.ObterPorIdAsync(editId);
+            CupomListItem? cupom = await CupomService.ObterPorCodigoAsync(editCodigo);
 
             if (cupom is null)
             {
@@ -179,13 +179,13 @@
         {
             if (IsEditMode)
             {
-                if (Id <= 0)
+                if (string.IsNullOrWhiteSpace(Codigo))
                 {
                     errorMessage = "Cupom invalido para edicao.";
                     return;
                 }
 
-                var editId = Id.GetValueOrDefault();
+                var editCodigo = Codigo;
 
                 var request = new AtualizarCupomRequest
                 {
@@ -194,7 +194,7 @@
                     ValorMinimoRegra = form.ValorMinimoRegra!.Value
                 };
 
-                var response = await CupomService.AtualizarAsync(editId, request);
+                var response = await CupomService.AtualizarAsync(editCodigo, request);
 
                 if (!response.Success)
                 {

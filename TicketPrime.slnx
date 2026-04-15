@@ -1,4 +1,5 @@
 <Solution>
-  <Project Path="TicketPrime.Api/TicketPrime.Api.csproj" />
+  <Project Path="src/TicketPrime.Api.csproj" />
   <Project Path="TicketPrime.Client/TicketPrime.Client.csproj" />
+  <Project Path="tests/TicketPrime.Tests.csproj" />
 </Solution>

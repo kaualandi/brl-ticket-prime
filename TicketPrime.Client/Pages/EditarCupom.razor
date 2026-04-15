@@ -1,8 +1,8 @@
-@page "/cupons/editar/{Id:int}"
+@page "/cupons/editar/{Codigo}"
 
-<CupomForm Id="@Id" />
+<CupomForm Codigo="@Codigo" />
 
 @code {
     [Parameter]
-    public int Id { get; set; }
+    public string Codigo { get; set; } = string.Empty;
 }

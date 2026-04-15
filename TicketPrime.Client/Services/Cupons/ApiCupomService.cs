@@ -36,9 +36,9 @@ public sealed class ApiCupomService(HttpClient http) : ICupomService
         return [];
     }
 
-    public async Task<CupomListItem?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<CupomListItem?> ObterPorCodigoAsync(string codigo, CancellationToken cancellationToken = default)
     {
-        var response = await http.GetAsync($"/api/cupons/{id}", cancellationToken);
+        var response = await http.GetAsync($"/api/cupons/{codigo}", cancellationToken);
 
         if (response.StatusCode == HttpStatusCode.NotFound)
         {
@@ -53,9 +53,9 @@ public sealed class ApiCupomService(HttpClient http) : ICupomService
         return null;
     }
 
-    public async Task<CriarCupomResult> AtualizarAsync(int id, AtualizarCupomRequest request, CancellationToken cancellationToken = default)
+    public async Task<CriarCupomResult> AtualizarAsync(string codigo, AtualizarCupomRequest request, CancellationToken cancellationToken = default)
     {
-        var response = await http.PutAsJsonAsync($"/api/cupons/{id}", request, cancellationToken);
+        var response = await http.PutAsJsonAsync($"/api/cupons/{codigo}", request, cancellationToken);
 
         if (response.StatusCode == HttpStatusCode.OK)
         {
@@ -75,9 +75,9 @@ public sealed class ApiCupomService(HttpClient http) : ICupomService
         return CriarCupomResult.Fail("Nao foi possivel atualizar o cupom agora. Tente novamente em instantes.");
     }
 
-    public async Task<CriarCupomResult> DeletarAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<CriarCupomResult> DeletarAsync(string codigo, CancellationToken cancellationToken = default)
     {
-        var response = await http.DeleteAsync($"/api/cupons/{id}", cancellationToken);
+        var response = await http.DeleteAsync($"/api/cupons/{codigo}", cancellationToken);
 
         if (response.StatusCode == HttpStatusCode.NoContent)
             return CriarCupomResult.Ok();

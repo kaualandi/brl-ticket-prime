@@ -70,12 +70,12 @@
                             <MudButton Class="action-button" Variant="Variant.Text"
                                        Color="Color.Primary"
                                        StartIcon="@Icons.Material.Filled.Edit"
-                                       OnClick="@(() => GoToEdit(context.Id))">
+                                       OnClick="@(() => GoToEdit(context.Codigo))">
                             </MudButton>
                             <MudButton Class="action-button" Variant="Variant.Text"
                                        Color="Color.Error"
                                        StartIcon="@Icons.Material.Filled.Delete"
-                                       OnClick="@(() => DeleteCupom(context.Id))">
+                                       OnClick="@(() => DeleteCupom(context.Codigo))">
                             </MudButton>
                         </MudTd>
                     </RowTemplate>
@@ -129,12 +129,12 @@
         Navigation.NavigateTo("/cupons/novo");
     }
 
-    private void GoToEdit(int id)
+    private void GoToEdit(string codigo)
     {
-        Navigation.NavigateTo($"/cupons/editar/{id}");
+        Navigation.NavigateTo($"/cupons/editar/{codigo}");
     }
 
-    private async Task DeleteCupom(int id)
+    private async Task DeleteCupom(string codigo)
     {
         var options = new MessageBoxOptions
         {
@@ -147,10 +147,10 @@
         var confirm = await DialogService.ShowMessageBoxAsync(options);
         if (confirm != true) return;
 
-        var result = await CupomService.DeletarAsync(id);
+        var result = await CupomService.DeletarAsync(codigo);
         if (result.Success)
         {
-            cupons.RemoveAll(c => c.Id == id);
+            cupons.RemoveAll(c => string.Equals(c.Codigo, codigo, StringComparison.OrdinalIgnoreCase));
             Snackbar.Add("Cupom excluído com sucesso!", Severity.Success);
         }
         else

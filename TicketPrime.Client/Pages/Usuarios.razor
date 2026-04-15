@@ -62,12 +62,12 @@
                             <MudButton Variant="Variant.Text"
                                        Color="Color.Primary"
                                        StartIcon="@Icons.Material.Filled.Edit"
-                                       OnClick="@(() => Navigation.NavigateTo($"/usuarios/editar/{context.Id}"))">
+                                       OnClick="@(() => Navigation.NavigateTo($"/usuarios/editar/{context.Cpf}"))">
                             </MudButton>
                             <MudButton Variant="Variant.Text"
                                        Color="Color.Error"
                                        StartIcon="@Icons.Material.Filled.Delete"
-                                       OnClick="@(() => DeleteUsuario(context.Id))">
+                                       OnClick="@(() => DeleteUsuario(context.Cpf))">
                             </MudButton>
                         </MudTd>
                     </RowTemplate>
@@ -109,13 +109,12 @@
 
     private class UsuarioDto
     {
-        public int Id { get; set; }
+        public string Cpf { get; set; } = string.Empty;
         public string Nome { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
-        public string Cpf { get; set; } = string.Empty;
     }
 
-    private async Task DeleteUsuario(int id)
+    private async Task DeleteUsuario(string cpf)
     {
         var options = new MessageBoxOptions
         {
@@ -131,10 +130,10 @@
 
         try
         {
-            var response = await Http.DeleteAsync($"api/usuarios/{id}");
+            var response = await Http.DeleteAsync($"api/usuarios/{cpf}");
             if (response.IsSuccessStatusCode)
             {
-                _usuarios.RemoveAll(u => u.Id == id);
+                _usuarios.RemoveAll(u => u.Cpf == cpf);
                 Snackbar.Add("Usuário excluído com sucesso!", Severity.Success);
             }
             else

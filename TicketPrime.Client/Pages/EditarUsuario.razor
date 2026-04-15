@@ -1,4 +1,4 @@
-@page "/usuarios/editar/{Id:int}"
+@page "/usuarios/editar/{Cpf}"
 @using System.ComponentModel.DataAnnotations
 @inject HttpClient Http
 @inject ISnackbar Snackbar
@@ -93,7 +93,7 @@
 
 @code {
     [Parameter]
-    public int Id { get; set; }
+    public string Cpf { get; set; } = string.Empty;
 
     private UsuarioFormModel _form = new();
     private bool _isSubmitting;
@@ -104,7 +104,7 @@
     {
         try
         {
-            var usuario = await Http.GetFromJsonAsync<UsuarioData>($"api/usuarios/{Id}");
+            var usuario = await Http.GetFromJsonAsync<UsuarioData>($"api/usuarios/{Cpf}");
             if (usuario is not null)
             {
                 _form.Nome = usuario.Nome;
@@ -142,7 +142,7 @@
                 Cpf = _form.Cpf!.Trim()
             };
 
-            var response = await Http.PutAsJsonAsync($"api/usuarios/{Id}", payload);
+            var response = await Http.PutAsJsonAsync($"api/usuarios/{Cpf}", payload);
 
             if (response.IsSuccessStatusCode)
             {

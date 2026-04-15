@@ -353,9 +353,29 @@ usuarios.MapPut("/{cpf}", async Task<Results<Ok, NotFound, BadRequest<string>>> 
         if (erro is not null)
             return TypedResults.BadRequest(erro);
 
+        var cpfAtual = cpf.Trim();
+        var cpfNovo = req.Cpf.Trim();
+
+        if (!cpfNovo.Equals(cpfAtual, StringComparison.OrdinalIgnoreCase))
+        {
+            var conflict = await db.ExecuteScalarAsync<int>(
+                "SELECT COUNT(*) FROM Usuarios WHERE Cpf = @CpfNovo",
+                new { CpfNovo = cpfNovo });
+
+            if (conflict > 0)
+                return TypedResults.BadRequest("CPF já cadastrado.");
+        }
+
         var rows = await db.ExecuteAsync(
-            "UPDATE Usuarios SET Nome = @Nome, Email = @Email, Senha = @Senha WHERE Cpf = @Cpf",
-            new { Cpf = cpf, Nome = req.Nome.Trim(), Email = req.Email.Trim(), Senha = req.Senha });
+            "UPDATE Usuarios SET Cpf = @CpfNovo, Nome = @Nome, Email = @Email, Senha = @Senha WHERE Cpf = @CpfAtual",
+            new
+            {
+                CpfAtual = cpfAtual,
+                CpfNovo = cpfNovo,
+                Nome = req.Nome.Trim(),
+                Email = req.Email.Trim(),
+                Senha = req.Senha
+            });
 
         return rows == 0
             ? TypedResults.NotFound()
@@ -429,6 +449,8 @@ static string? ValidarUsuario(CreateUsuarioRequest req)
 
 static string? ValidarUsuarioParaAtualizacao(CreateUsuarioRequest req)
 {
+    if (string.IsNullOrWhiteSpace(req.Cpf))
+        return "CPF é obrigatório.";
     if (string.IsNullOrWhiteSpace(req.Nome))
         return "Nome é obrigatório.";
     if (string.IsNullOrWhiteSpace(req.Email))

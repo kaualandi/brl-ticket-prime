@@ -59,16 +59,18 @@
                         <MudTd DataLabel="Email">@context.Email</MudTd>
                         <MudTd DataLabel="CPF">@FormatCpf(context.Cpf)</MudTd>
                         <MudTd DataLabel="Ações">
-                            <MudButton Variant="Variant.Text"
-                                       Color="Color.Primary"
-                                       StartIcon="@Icons.Material.Filled.Edit"
-                                       OnClick="@(() => Navigation.NavigateTo($"/usuarios/editar/{context.Cpf}"))">
-                            </MudButton>
-                            <MudButton Variant="Variant.Text"
-                                       Color="Color.Error"
-                                       StartIcon="@Icons.Material.Filled.Delete"
-                                       OnClick="@(() => DeleteUsuario(context.Cpf))">
-                            </MudButton>
+                            <MudIconButton Class="action-icon-button"
+                                           Icon="@Icons.Material.Filled.Edit"
+                                           Color="Color.Primary"
+                                           Size="Size.Small"
+                                           aria-label="Editar usuário"
+                                           OnClick="@(() => Navigation.NavigateTo($"/usuarios/editar/{context.Cpf}"))" />
+                            <MudIconButton Class="action-icon-button"
+                                           Icon="@Icons.Material.Filled.Delete"
+                                           Color="Color.Error"
+                                           Size="Size.Small"
+                                           aria-label="Excluir usuário"
+                                           OnClick="@(() => DeleteUsuario(context.Cpf))" />
                         </MudTd>
                     </RowTemplate>
                     <NoRecordsContent>

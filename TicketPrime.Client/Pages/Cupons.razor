@@ -67,16 +67,18 @@
                         <MudTd DataLabel="Desconto">@context.PorcentagemDesconto.ToString("N0")%</MudTd>
                         <MudTd DataLabel="Valor minimo">@context.ValorMinimoRegra</MudTd>
                         <MudTd DataLabel="Acoes">
-                            <MudButton Class="action-button" Variant="Variant.Text"
-                                       Color="Color.Primary"
-                                       StartIcon="@Icons.Material.Filled.Edit"
-                                       OnClick="@(() => GoToEdit(context.Codigo))">
-                            </MudButton>
-                            <MudButton Class="action-button" Variant="Variant.Text"
-                                       Color="Color.Error"
-                                       StartIcon="@Icons.Material.Filled.Delete"
-                                       OnClick="@(() => DeleteCupom(context.Codigo))">
-                            </MudButton>
+                            <MudIconButton Class="action-icon-button"
+                                           Icon="@Icons.Material.Filled.Edit"
+                                           Color="Color.Primary"
+                                           Size="Size.Small"
+                                           aria-label="Editar cupom"
+                                           OnClick="@(() => GoToEdit(context.Codigo))" />
+                            <MudIconButton Class="action-icon-button"
+                                           Icon="@Icons.Material.Filled.Delete"
+                                           Color="Color.Error"
+                                           Size="Size.Small"
+                                           aria-label="Excluir cupom"
+                                           OnClick="@(() => DeleteCupom(context.Codigo))" />
                         </MudTd>
                     </RowTemplate>
                     <NoRecordsContent>

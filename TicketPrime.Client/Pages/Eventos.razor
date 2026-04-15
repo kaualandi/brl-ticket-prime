@@ -85,16 +85,18 @@
                                     ShowActions="true"
                                     BadgeText="@(destaque ? "Mais próximo" : "Agenda aberta")">
                             <ActionsContent>
-                                <MudButton Variant="Variant.Text"
-                                           Color="Color.Primary"
-                                           StartIcon="@Icons.Material.Filled.Edit"
-                                           OnClick="@(() => Navigation.NavigateTo($"/eventos/editar/{eventoCapturado.Id}"))">
-                                </MudButton>
-                                <MudButton Variant="Variant.Text"
-                                           Color="Color.Error"
-                                           StartIcon="@Icons.Material.Filled.Delete"
-                                           OnClick="@(() => DeleteEvento(eventoCapturado.Id))">
-                                </MudButton>
+                                <MudIconButton Class="action-icon-button"
+                                               Icon="@Icons.Material.Filled.Edit"
+                                               Color="Color.Primary"
+                                               Size="Size.Small"
+                                               aria-label="Editar evento"
+                                               OnClick="@(() => Navigation.NavigateTo($"/eventos/editar/{eventoCapturado.Id}"))" />
+                                <MudIconButton Class="action-icon-button"
+                                               Icon="@Icons.Material.Filled.Delete"
+                                               Color="Color.Error"
+                                               Size="Size.Small"
+                                               aria-label="Excluir evento"
+                                               OnClick="@(() => DeleteEvento(eventoCapturado.Id))" />
                             </ActionsContent>
                         </EventoCard>
                     </div>

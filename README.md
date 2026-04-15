@@ -66,6 +66,9 @@ Em terminais separados:
 # API (http://localhost:5201)
 dotnet watch --project src --launch-profile http
 
+# Swagger UI
+http://localhost:5201/swagger
+
 # Client Blazor (http://localhost:5272)
 dotnet watch --project TicketPrime.Client
 

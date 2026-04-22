@@ -75,3 +75,12 @@ dotnet watch --project TicketPrime.Client
 # Testes
 dotnet test tests
 ```
+
+# Integrantes
+
+- Lucas Abrahão Anes - 06009881
+- Kauã Landi Fernando - 06009262
+- Natan de Souza Sampaio - 06010668
+- Guilherme da Cunha Sequeira - 06002529
+- Murilo de Melo Mouteira - 06010561
+- Lucas Gomes Coco da Silva - 06011471
